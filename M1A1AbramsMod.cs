@@ -8,8 +8,8 @@ using MelonLoader;
 using UnityEngine;
 using GHPC.Weapons;
 using GHPC.Vehicle;
-using GHPC.Equipment;
-using GHPC.Equipment.Optics;
+using GHPC.Camera;
+using GHPC.Player;
 
 namespace M1A1Abrams
 {
@@ -20,6 +20,9 @@ namespace M1A1Abrams
         MelonPreferences_Entry<int> m830Count;
 
         GameObject[] vic_gos;
+        GameObject gameManager;
+        CameraManager cameraManager;
+        PlayerInput playerManager; 
 
         WeaponSystemCodexScriptable gun_m256;
 
@@ -81,10 +84,31 @@ namespace M1A1Abrams
             m830Count = cfg.CreateEntry<int>("M830", 18);
         }
 
+        // the GAS reticles seem to be assigned to specific ammo types and I can't figure out how it's done
+        public override void OnUpdate() { 
+            if (gameManager == null) return; 
+
+            FieldInfo currentCamSlot = typeof(CameraManager).GetField("_currentCamSlot", BindingFlags.Instance | BindingFlags.NonPublic);
+            CameraSlot cam = (CameraSlot)currentCamSlot.GetValue(cameraManager);
+
+            if (cam == null) return;
+            if (cam.name != "Aux sight (GAS)") return;
+            if (playerManager.CurrentPlayerWeapon.Name != "120mm gun M256") return;
+
+            AmmoType currentAmmo = playerManager.CurrentPlayerWeapon.FCS.CurrentAmmoType;
+            int reticleId = (currentAmmo.Name == "M829 APFSDS-T") ? 0 : 2;
+
+            GameObject reticle = cam.transform.GetChild(reticleId).gameObject;
+
+            if (!reticle.activeSelf) { 
+                reticle.SetActive(true);
+            }
+        }
+
         public override void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
             // note to self: not all vehicles are tagged with "vehicle"
-            //               probably will not convert retroactively added m1ips to m1a1s 
+            //               will not convert retroactively added m1ips to m1a1s 
 
             if (sceneName == "LOADER_INITIAL" || sceneName == "MainMenu2_Scene") return;
 
@@ -136,6 +160,7 @@ namespace M1A1Abrams
                 clip_codex_m829.name = "clip_m829";
                 clip_codex_m829.CompatibleWeaponSystems = new WeaponSystemCodexScriptable[1];
                 clip_codex_m829.CompatibleWeaponSystems[0] = gun_m256;
+
                 clip_codex_m829.ClipType = clip_m829;
 
                 // m830
@@ -174,6 +199,10 @@ namespace M1A1Abrams
                 // generate visual models 
 
                 if (vic.FriendlyName == "M1IP") {
+                    gameManager = GameObject.Find("_APP_GHPC_");
+                    cameraManager = gameManager.GetComponent<CameraManager>();
+                    playerManager = gameManager.GetComponent<PlayerInput>();
+
                     GameObject ammo_m829_vis = null;
                     GameObject ammo_m830_vis = null;
 
@@ -201,8 +230,10 @@ namespace M1A1Abrams
 
                     // convert to m256 gun
                     WeaponsManager weaponsManager = vic.GetComponent<WeaponsManager>();
-                    WeaponSystem mainGun = weaponsManager.Weapons[0].Weapon;
+                    WeaponSystemInfo mainGunInfo = weaponsManager.Weapons[0];
+                    WeaponSystem mainGun = mainGunInfo.Weapon;
 
+                    mainGunInfo.Name = "120mm gun M256";
                     mainGun.Impulse = 68000;
                     FieldInfo codex = typeof(WeaponSystem).GetField("CodexEntry", BindingFlags.NonPublic | BindingFlags.Instance);
                     codex.SetValue(mainGun, gun_m256);
@@ -234,10 +265,9 @@ namespace M1A1Abrams
                     MethodInfo refreshBreech = typeof(AmmoFeed).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic); // silently load M829
                     refreshBreech.Invoke(mainGun.Feed, new object[] {});
 
-                    // update ballistic computer
+                    // update ballistics computer
                     MethodInfo registerAllBallistics = typeof(LoadoutManager).GetMethod("RegisterAllBallistics", BindingFlags.Instance | BindingFlags.NonPublic);
                     registerAllBallistics.Invoke(loadoutManager, new object[] {});
-
                 }
             }
         }
