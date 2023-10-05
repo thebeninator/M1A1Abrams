@@ -269,7 +269,7 @@ namespace M1A1Abrams
                     codex.SetValue(mainGun, gun_m256);
 
                     GameObject gunTube = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/gun_recoil").gameObject;
-                    gunTube.transform.localScale = new Vector3(1.35f, 1.35f, 0.98f);
+                    gunTube.transform.localScale = new Vector3(1.4f, 1.4f, 0.98f);
 
                     // convert ammo
                     LoadoutManager loadoutManager = vic.GetComponent<LoadoutManager>();
