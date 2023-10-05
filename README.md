@@ -4,9 +4,9 @@
 <p>
   Converts all M1IPs to M1A1s: 
   <ul>
-    <li>105mm M68A1 -> 120mm M256</li>
-    <li>M456 HEAT-FS-T -> M830 HEAT-MP-T</li>
-    <li>M833 APFSDS-T  -> M829 APFSDS-T</li>
+    <li>120mm M256</li>
+    <li>M830 HEAT-MP-T</li>
+    <li>M829 APFSDS-T</li>
   </ul>
   You can customize how many M829 and M830 rounds each M1A1 carries (total 40 rounds).
 </p>
