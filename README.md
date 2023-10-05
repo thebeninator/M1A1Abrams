@@ -10,6 +10,3 @@
   </ul>
   You can customize how many M829 and M830 rounds every M1A1 carries (total 40 rounds).
 </p>
-
-# Known Issues
-<p>M1A1 GAS has no reticles for M829/M830</p>
