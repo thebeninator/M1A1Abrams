@@ -1,7 +1,8 @@
 # M1A1 Abrams
 A mod for Gunner, HEAT, PC! Requires [MelonLoader](https://github.com/LavaGang/MelonLoader/)
 
-![M1A1](https://github.com/thebeninator/M1A1Abrams/assets/89621837/a9eedc6f-52ff-47b9-a158-b46750a0bf99)
+![Screenshot_6](https://github.com/thebeninator/M1A1Abrams/assets/89621837/354d28e0-fa3d-49b2-89f4-368860f66dc9)
+
 
 <p>
 Converts all M1IPs to M1A1s equipped with: 
