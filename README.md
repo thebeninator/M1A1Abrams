@@ -1,5 +1,5 @@
 # M1A1 Abrams
-<p>A mod for Gunner, HEAT, PC! Requires MelonLoader.</p>
+A mod for Gunner, HEAT, PC! Requires [MelonLoader](https://github.com/LavaGang/MelonLoader/)
 
 ![M1A1](https://github.com/thebeninator/M1A1Abrams/assets/89621837/a9eedc6f-52ff-47b9-a158-b46750a0bf99)
 
