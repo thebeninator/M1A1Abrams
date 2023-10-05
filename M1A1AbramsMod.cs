@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reflection;
 using MelonLoader;
 using UnityEngine;
@@ -10,6 +8,7 @@ using GHPC.Weapons;
 using GHPC.Vehicle;
 using GHPC.Camera;
 using GHPC.Player;
+using GHPC.Equipment.Optics;
 
 namespace M1A1Abrams
 {
@@ -18,6 +17,7 @@ namespace M1A1Abrams
         MelonPreferences_Category cfg;
         MelonPreferences_Entry<int> m829Count;
         MelonPreferences_Entry<int> m830Count;
+        MelonPreferences_Entry<bool> rotateAzimuth; 
 
         GameObject[] vic_gos;
         GameObject gameManager;
@@ -84,6 +84,9 @@ namespace M1A1Abrams
             m829Count = cfg.CreateEntry<int>("M829", 22);
             m829Count.Description = "How many rounds of M829 (APFSDS) or M830 (HEAT) each M1A1 should carry. Maximum of 40 rounds total. Bring in at least one M829 round.";
             m830Count = cfg.CreateEntry<int>("M830", 18);
+
+            rotateAzimuth = cfg.CreateEntry<bool>("RotateAzimuth", false);
+            rotateAzimuth.Description = "Horizontal stabilization of M1A1 sights when applying lead.";
         }
 
         // the GAS reticles seem to be assigned to specific ammo types and I can't figure out how it's done
@@ -237,6 +240,12 @@ namespace M1A1Abrams
                     WeaponsManager weaponsManager = vic.GetComponent<WeaponsManager>();
                     WeaponSystemInfo mainGunInfo = weaponsManager.Weapons[0];
                     WeaponSystem mainGun = mainGunInfo.Weapon;
+
+                    if (rotateAzimuth.Value) {
+                        UsableOptic primaryOptic = vic_go.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/GPS/Optic").gameObject.GetComponent<UsableOptic>();
+                        primaryOptic.RotateAzimuth = true;
+                        primaryOptic.slot.LinkedNightSight.PairedOptic.RotateAzimuth = true; 
+                    }
 
                     mainGunInfo.Name = "120mm gun M256";
                     mainGun.Impulse = 68000;
