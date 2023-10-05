@@ -86,9 +86,9 @@ namespace M1A1Abrams
             // note to self: not all vehicles are tagged with "vehicle"
             //               probably will not convert retroactively added m1ips to m1a1s 
 
-            vic_gos = GameObject.FindGameObjectsWithTag("Vehicle");
+            if (sceneName == "LOADER_INITIAL" || sceneName == "MainMenu2_Scene") return;
 
-            if (sceneName == "LOADER_INITIAL" || sceneName == "MainMenu2_Scene") return; 
+            vic_gos = GameObject.FindGameObjectsWithTag("Vehicle");
 
             if (gun_m256 == null)
             {
