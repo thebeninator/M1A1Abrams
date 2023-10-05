@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Reflection; 
+using System.Reflection;
 using MelonLoader;
 using UnityEngine;
 using GHPC.Weapons;
@@ -22,7 +22,7 @@ namespace M1A1Abrams
         GameObject[] vic_gos;
         GameObject gameManager;
         CameraManager cameraManager;
-        PlayerInput playerManager; 
+        PlayerInput playerManager;
 
         WeaponSystemCodexScriptable gun_m256;
 
@@ -67,17 +67,19 @@ namespace M1A1Abrams
 
             rack.SlotIndicesByAmmoType = new Dictionary<AmmoType, List<byte>>();
 
-            foreach (Transform transform in rack.VisualSlots) {
+            foreach (Transform transform in rack.VisualSlots)
+            {
                 AmmoStoredVisual vis = transform.GetComponentInChildren<AmmoStoredVisual>();
 
                 if (vis != null && vis.AmmoType != null)
                 {
-                    removeVis.Invoke(rack, new object[] {transform});
+                    removeVis.Invoke(rack, new object[] { transform });
                 }
             }
         }
 
-        public override void OnInitializeMelon() {
+        public override void OnInitializeMelon()
+        {
             cfg = MelonPreferences.CreateCategory("M1A1Config");
             m829Count = cfg.CreateEntry<int>("M829", 22);
             m829Count.Description = "How many rounds of M829 (APFSDS) or M830 (HEAT) each M1A1 should carry. Maximum of 40 rounds total. Bring in at least one M829 round.";
@@ -85,8 +87,9 @@ namespace M1A1Abrams
         }
 
         // the GAS reticles seem to be assigned to specific ammo types and I can't figure out how it's done
-        public override void OnUpdate() { 
-            if (gameManager == null) return; 
+        public override void OnUpdate()
+        {
+            if (gameManager == null) return;
 
             FieldInfo currentCamSlot = typeof(CameraManager).GetField("_currentCamSlot", BindingFlags.Instance | BindingFlags.NonPublic);
             CameraSlot cam = (CameraSlot)currentCamSlot.GetValue(cameraManager);
@@ -100,7 +103,8 @@ namespace M1A1Abrams
 
             GameObject reticle = cam.transform.GetChild(reticleId).gameObject;
 
-            if (!reticle.activeSelf) { 
+            if (!reticle.activeSelf)
+            {
                 reticle.SetActive(true);
             }
         }
@@ -191,14 +195,14 @@ namespace M1A1Abrams
                 clip_codex_m830.ClipType = clip_m830;
             }
 
-            foreach (GameObject vic_go in vic_gos) {
+            foreach (GameObject vic_go in vic_gos)
+            {
                 Vehicle vic = vic_go.GetComponent<Vehicle>();
 
                 if (vic == null) continue;
 
-                // generate visual models 
-
-                if (vic.FriendlyName == "M1IP") {
+                if (vic.FriendlyName == "M1IP")
+                {
                     gameManager = GameObject.Find("_APP_GHPC_");
                     cameraManager = gameManager.GetComponent<CameraManager>();
                     playerManager = gameManager.GetComponent<PlayerInput>();
@@ -206,6 +210,7 @@ namespace M1A1Abrams
                     GameObject ammo_m829_vis = null;
                     GameObject ammo_m830_vis = null;
 
+                    // generate visual models 
                     if (ammo_m829_vis == null)
                     {
                         ammo_m829_vis = GameObject.Instantiate(ammo_m833.VisualModel);
@@ -244,16 +249,17 @@ namespace M1A1Abrams
                     // convert ammo
                     LoadoutManager loadoutManager = vic.GetComponent<LoadoutManager>();
 
-                    loadoutManager.TotalAmmoCounts = new int[] {m829Count.Value, m830Count.Value};
-                    loadoutManager.LoadedAmmoTypes = new AmmoClipCodexScriptable[] {clip_codex_m829, clip_codex_m830};
+                    loadoutManager.TotalAmmoCounts = new int[] { m829Count.Value, m830Count.Value };
+                    loadoutManager.LoadedAmmoTypes = new AmmoClipCodexScriptable[] { clip_codex_m829, clip_codex_m830 };
 
                     FieldInfo totalAmmoCount = typeof(LoadoutManager).GetField("_totalAmmoCount", BindingFlags.NonPublic | BindingFlags.Instance);
                     totalAmmoCount.SetValue(loadoutManager, 40);
 
-                    for (int i = 0; i <= 2; i++) { 
+                    for (int i = 0; i <= 2; i++)
+                    {
                         GHPC.Weapons.AmmoRack rack = loadoutManager.RackLoadouts[i].Rack;
                         rack.ClipCapacity = i == 2 ? 4 : 18;
-                        rack.ClipTypes = new AmmoType.AmmoClip[] {clip_m829, clip_m830};
+                        rack.ClipTypes = new AmmoType.AmmoClip[] { clip_m829, clip_m830 };
                         EmptyRack(rack);
                     }
 
@@ -263,11 +269,11 @@ namespace M1A1Abrams
                     roundInBreech.SetValue(mainGun.Feed, null);
 
                     MethodInfo refreshBreech = typeof(AmmoFeed).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic); // silently load M829
-                    refreshBreech.Invoke(mainGun.Feed, new object[] {});
+                    refreshBreech.Invoke(mainGun.Feed, new object[] { });
 
                     // update ballistics computer
                     MethodInfo registerAllBallistics = typeof(LoadoutManager).GetMethod("RegisterAllBallistics", BindingFlags.Instance | BindingFlags.NonPublic);
-                    registerAllBallistics.Invoke(loadoutManager, new object[] {});
+                    registerAllBallistics.Invoke(loadoutManager, new object[] { });
                 }
             }
         }
