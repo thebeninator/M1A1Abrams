@@ -4,7 +4,7 @@ A mod for Gunner, HEAT, PC! Requires [MelonLoader](https://github.com/LavaGang/M
 ![M1A1](https://github.com/thebeninator/M1A1Abrams/assets/89621837/a9eedc6f-52ff-47b9-a158-b46750a0bf99)
 
 <p>
-Converts all M1IPs to M1A1s: 
+Converts all M1IPs to M1A1s equipped with: 
 	<ul>
 		<li>120mm M256</li>
     	<li>M830 HEAT-MP-T</li>
