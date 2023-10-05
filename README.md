@@ -1,4 +1,4 @@
-# M1A1Abrams
+# M1A1 Abrams
 <p>A mod for Gunner, HEAT, PC!</p>
 
 <p>
@@ -9,3 +9,6 @@
     <li>M833 APFSDS-T  -> M829 APFSDS-T</li>
   </ul>
 </p>
+
+# Known Issues
+<p>M1A1 GAS has no reticles for M829/M830</p>
