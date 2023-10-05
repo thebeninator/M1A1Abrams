@@ -17,7 +17,10 @@ namespace M1A1Abrams
         MelonPreferences_Category cfg;
         MelonPreferences_Entry<int> m829Count;
         MelonPreferences_Entry<int> m830Count;
-        MelonPreferences_Entry<bool> rotateAzimuth; 
+        MelonPreferences_Entry<bool> rotateAzimuth;
+        MelonPreferences_Entry<bool> m1e1;
+        MelonPreferences_Entry<int> randomChanceNum;
+        MelonPreferences_Entry<bool> randomChance;
 
         GameObject[] vic_gos;
         GameObject gameManager;
@@ -87,6 +90,13 @@ namespace M1A1Abrams
 
             rotateAzimuth = cfg.CreateEntry<bool>("RotateAzimuth", false);
             rotateAzimuth.Description = "Horizontal stabilization of M1A1 sights when applying lead.";
+
+            m1e1 = cfg.CreateEntry<bool>("M1E1", false);
+            m1e1.Description = "Convert M1s to M1E1s (i.e: they get the 120mm gun).";
+
+            randomChance = cfg.CreateEntry<bool>("Random", false);
+            randomChance.Description = "M1IPs/M1s will have a random chance of being converted to M1A1s/M1E1s.";
+            randomChanceNum = cfg.CreateEntry<int>("ConversionChance", 50);
         }
 
         // the GAS reticles seem to be assigned to specific ammo types and I can't figure out how it's done
@@ -204,8 +214,12 @@ namespace M1A1Abrams
 
                 if (vic == null) continue;
 
-                if (vic.FriendlyName == "M1IP")
+                if (vic.FriendlyName == "M1IP" || (m1e1.Value && vic.FriendlyName == "M1"))
                 {
+                    if (randomChance.Value) {
+                        if (UnityEngine.Random.Range(1, 101) > randomChanceNum.Value) continue; 
+                    }
+
                     gameManager = GameObject.Find("_APP_GHPC_");
                     cameraManager = gameManager.GetComponent<CameraManager>();
                     playerManager = gameManager.GetComponent<PlayerInput>();
@@ -230,11 +244,13 @@ namespace M1A1Abrams
                     }
 
                     // rename to m1a1
+                    string name = (vic.FriendlyName == "M1IP") ? "M1A1" : "M1E1";
+
                     FieldInfo friendlyName = typeof(GHPC.Unit).GetField("_friendlyName", BindingFlags.NonPublic | BindingFlags.Instance);
-                    friendlyName.SetValue(vic, "M1A1");
+                    friendlyName.SetValue(vic, name);
 
                     FieldInfo uniqueName = typeof(GHPC.Unit).GetField("_uniqueName", BindingFlags.NonPublic | BindingFlags.Instance);
-                    uniqueName.SetValue(vic, "M1A1");
+                    uniqueName.SetValue(vic, name);
 
                     // convert to m256 gun
                     WeaponsManager weaponsManager = vic.GetComponent<WeaponsManager>();
