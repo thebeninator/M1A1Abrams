@@ -8,7 +8,7 @@
     <li>M830 HEAT-MP-T</li>
     <li>M829 APFSDS-T</li>
   </ul>
-  You can customize how many M829 and M830 rounds each M1A1 carries (total 40 rounds).
+  You can customize how many M829 and M830 rounds every M1A1 carries (total 40 rounds).
 </p>
 
 # Known Issues
