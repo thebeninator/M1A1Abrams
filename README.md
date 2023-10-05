@@ -1,6 +1,8 @@
 # M1A1 Abrams
 A mod for Gunner, HEAT, PC! Requires [MelonLoader](https://github.com/LavaGang/MelonLoader/)
 
+Gameplay/Install guide: https://www.youtube.com/watch?v=e_qNIyBb2SA
+
 ![Screenshot_6](https://github.com/thebeninator/M1A1Abrams/assets/89621837/354d28e0-fa3d-49b2-89f4-368860f66dc9)
 
 
