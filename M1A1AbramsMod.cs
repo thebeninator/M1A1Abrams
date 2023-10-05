@@ -8,6 +8,8 @@ using MelonLoader;
 using UnityEngine;
 using GHPC.Weapons;
 using GHPC.Vehicle;
+using GHPC.Equipment;
+using GHPC.Equipment.Optics;
 
 namespace M1A1Abrams
 {
@@ -170,20 +172,26 @@ namespace M1A1Abrams
                 if (vic == null) continue;
 
                 // generate visual models 
-                GameObject ammo_m829_vis = GameObject.Instantiate(ammo_m833.VisualModel);
-                ammo_m829_vis.name = "M829 visual";
-                ammo_m829.VisualModel = ammo_m829_vis;
-                ammo_m829.VisualModel.GetComponent<AmmoStoredVisual>().AmmoType = ammo_m829;
-                ammo_m829.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m829;
-
-                GameObject ammo_m830_vis = GameObject.Instantiate(ammo_m456.VisualModel);
-                ammo_m830_vis.name = "M830 visual";
-                ammo_m830.VisualModel = ammo_m830_vis;
-                ammo_m830.VisualModel.GetComponent<AmmoStoredVisual>().AmmoType = ammo_m830;
-                ammo_m830.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m830;
-
 
                 if (vic.FriendlyName == "M1IP") {
+                    GameObject ammo_m829_vis = null;
+                    GameObject ammo_m830_vis = null;
+
+                    if (ammo_m829_vis == null)
+                    {
+                        ammo_m829_vis = GameObject.Instantiate(ammo_m833.VisualModel);
+                        ammo_m829_vis.name = "M829 visual";
+                        ammo_m829.VisualModel = ammo_m829_vis;
+                        ammo_m829.VisualModel.GetComponent<AmmoStoredVisual>().AmmoType = ammo_m829;
+                        ammo_m829.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m829;
+
+                        ammo_m830_vis = GameObject.Instantiate(ammo_m456.VisualModel);
+                        ammo_m830_vis.name = "M830 visual";
+                        ammo_m830.VisualModel = ammo_m830_vis;
+                        ammo_m830.VisualModel.GetComponent<AmmoStoredVisual>().AmmoType = ammo_m830;
+                        ammo_m830.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m830;
+                    }
+
                     // rename to m1a1
                     FieldInfo friendlyName = typeof(GHPC.Unit).GetField("_friendlyName", BindingFlags.NonPublic | BindingFlags.Instance);
                     friendlyName.SetValue(vic, "M1A1");
@@ -195,7 +203,7 @@ namespace M1A1Abrams
                     WeaponsManager weaponsManager = vic.GetComponent<WeaponsManager>();
                     WeaponSystem mainGun = weaponsManager.Weapons[0].Weapon;
 
-                    mainGun.Impulse = 66000;
+                    mainGun.Impulse = 68000;
                     FieldInfo codex = typeof(WeaponSystem).GetField("CodexEntry", BindingFlags.NonPublic | BindingFlags.Instance);
                     codex.SetValue(mainGun, gun_m256);
 
@@ -214,6 +222,7 @@ namespace M1A1Abrams
                     for (int i = 0; i <= 2; i++) { 
                         GHPC.Weapons.AmmoRack rack = loadoutManager.RackLoadouts[i].Rack;
                         rack.ClipCapacity = i == 2 ? 4 : 18;
+                        rack.ClipTypes = new AmmoType.AmmoClip[] {clip_m829, clip_m830};
                         EmptyRack(rack);
                     }
 
@@ -228,6 +237,7 @@ namespace M1A1Abrams
                     // update ballistic computer
                     MethodInfo registerAllBallistics = typeof(LoadoutManager).GetMethod("RegisterAllBallistics", BindingFlags.Instance | BindingFlags.NonPublic);
                     registerAllBallistics.Invoke(loadoutManager, new object[] {});
+
                 }
             }
         }
