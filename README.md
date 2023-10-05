@@ -1,5 +1,5 @@
 # M1A1 Abrams
-<p>A mod for Gunner, HEAT, PC!</p>
+<p>A mod for Gunner, HEAT, PC! Requires MelonLoader.</p>
 
 <p>
   Converts all M1IPs to M1A1s: 
