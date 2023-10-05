@@ -171,9 +171,8 @@ namespace M1A1Abrams
 
                 if (vic == null) continue;
 
-                // generate visual models 
-
                 if (vic.FriendlyName == "M1IP") {
+                    // generate visual models 
                     GameObject ammo_m829_vis = null;
                     GameObject ammo_m830_vis = null;
 
