@@ -189,7 +189,8 @@ namespace M1A1Abrams
                 ammo_m830.TntEquivalentKg = 1.814f;
                 ammo_m830.MuzzleVelocity = 1140f;
                 ammo_m830.Mass = 13.5f;
-                ammo_m830.CertainRicochetAngle = 8.0f;
+                ammo_m830.CertainRicochetAngle = 0.0f;
+                ammo_m830.ShatterOnRicochet = false;
 
                 ammo_codex_m830 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_m830.AmmoType = ammo_m830;
