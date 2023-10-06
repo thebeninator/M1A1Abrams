@@ -21,6 +21,7 @@ namespace M1A1Abrams
         MelonPreferences_Entry<bool> m1e1;
         MelonPreferences_Entry<int> randomChanceNum;
         MelonPreferences_Entry<bool> randomChance;
+        MelonPreferences_Entry<bool> useSuperSabot; 
 
         GameObject[] vic_gos;
         GameObject gameManager;
@@ -33,6 +34,11 @@ namespace M1A1Abrams
         AmmoType.AmmoClip clip_m829;
         AmmoCodexScriptable ammo_codex_m829;
         AmmoType ammo_m829;
+
+        AmmoClipCodexScriptable clip_codex_m829a1;
+        AmmoType.AmmoClip clip_m829a1;
+        AmmoCodexScriptable ammo_codex_m829a1;
+        AmmoType ammo_m829a1;
 
         AmmoClipCodexScriptable clip_codex_m830;
         AmmoType.AmmoClip clip_m830;
@@ -87,6 +93,9 @@ namespace M1A1Abrams
             m829Count = cfg.CreateEntry<int>("M829", 22);
             m829Count.Description = "How many rounds of M829 (APFSDS) or M830 (HEAT) each M1A1 should carry. Maximum of 40 rounds total. Bring in at least one M829 round.";
             m830Count = cfg.CreateEntry<int>("M830", 18);
+
+            useSuperSabot = cfg.CreateEntry<bool>("UseM829A1", false);
+            useSuperSabot.Description = "In case 600mm of RHA penetration is not working out for you...";
 
             rotateAzimuth = cfg.CreateEntry<bool>("RotateAzimuth", false);
             rotateAzimuth.Description = "Horizontal stabilization of M1A1 sights when applying lead.";
@@ -161,7 +170,7 @@ namespace M1A1Abrams
                 ammo_m829.Caliber = 120;
                 ammo_m829.RhaPenetration = 600;
                 ammo_m829.MuzzleVelocity = 1670f;
-                ammo_m829.Mass = 4.9f;
+                ammo_m829.Mass = 3.9f;
 
                 ammo_codex_m829 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_m829.AmmoType = ammo_m829;
@@ -177,8 +186,32 @@ namespace M1A1Abrams
                 clip_codex_m829.name = "clip_m829";
                 clip_codex_m829.CompatibleWeaponSystems = new WeaponSystemCodexScriptable[1];
                 clip_codex_m829.CompatibleWeaponSystems[0] = gun_m256;
-
                 clip_codex_m829.ClipType = clip_m829;
+
+                // m829a1
+                ammo_m829a1 = new AmmoType();
+                ShallowCopy(ammo_m829a1, ammo_m833);
+                ammo_m829a1.Name = "M829A1 APFSDS-T";
+                ammo_m829a1.Caliber = 120;
+                ammo_m829a1.RhaPenetration = 700;
+                ammo_m829a1.MuzzleVelocity = 1575;
+                ammo_m829a1.Mass = 4.6f;
+
+                ammo_codex_m829a1 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
+                ammo_codex_m829a1.AmmoType = ammo_m829a1;
+                ammo_codex_m829a1.name = "ammo_m829a1";
+
+                clip_m829a1 = new AmmoType.AmmoClip();
+                clip_m829a1.Capacity = 1;
+                clip_m829a1.Name = "M829A1 APFSDS-T";
+                clip_m829a1.MinimalPattern = new AmmoCodexScriptable[1];
+                clip_m829a1.MinimalPattern[0] = ammo_codex_m829a1;
+
+                clip_codex_m829a1 = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
+                clip_codex_m829a1.name = "clip_m829a1";
+                clip_codex_m829a1.CompatibleWeaponSystems = new WeaponSystemCodexScriptable[1];
+                clip_codex_m829a1.CompatibleWeaponSystems[0] = gun_m256;
+                clip_codex_m829a1.ClipType = clip_m829a1;
 
                 // m830
                 ammo_m830 = new AmmoType();
@@ -189,7 +222,7 @@ namespace M1A1Abrams
                 ammo_m830.TntEquivalentKg = 1.814f;
                 ammo_m830.MuzzleVelocity = 1140f;
                 ammo_m830.Mass = 13.5f;
-                ammo_m830.CertainRicochetAngle = 0.0f;
+                ammo_m830.CertainRicochetAngle = 8.0f;
                 ammo_m830.ShatterOnRicochet = false;
 
                 ammo_codex_m830 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
@@ -226,6 +259,7 @@ namespace M1A1Abrams
                     playerManager = gameManager.GetComponent<PlayerInput>();
 
                     GameObject ammo_m829_vis = null;
+                    GameObject ammo_m829a1_vis = null;
                     GameObject ammo_m830_vis = null;
 
                     // generate visual models 
@@ -236,6 +270,12 @@ namespace M1A1Abrams
                         ammo_m829.VisualModel = ammo_m829_vis;
                         ammo_m829.VisualModel.GetComponent<AmmoStoredVisual>().AmmoType = ammo_m829;
                         ammo_m829.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m829;
+
+                        ammo_m829a1_vis = GameObject.Instantiate(ammo_m833.VisualModel);
+                        ammo_m829a1_vis.name = "M829A1 visual";
+                        ammo_m829a1.VisualModel = ammo_m829_vis;
+                        ammo_m829a1.VisualModel.GetComponent<AmmoStoredVisual>().AmmoType = ammo_m829a1;
+                        ammo_m829a1.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m829a1;
 
                         ammo_m830_vis = GameObject.Instantiate(ammo_m456.VisualModel);
                         ammo_m830_vis.name = "M830 visual";
@@ -276,7 +316,10 @@ namespace M1A1Abrams
                     LoadoutManager loadoutManager = vic.GetComponent<LoadoutManager>();
 
                     loadoutManager.TotalAmmoCounts = new int[] { m829Count.Value, m830Count.Value };
-                    loadoutManager.LoadedAmmoTypes = new AmmoClipCodexScriptable[] { clip_codex_m829, clip_codex_m830 };
+
+                    AmmoClipCodexScriptable sabotClipCodex = (useSuperSabot.Value) ? clip_codex_m829a1 : clip_codex_m829;
+
+                    loadoutManager.LoadedAmmoTypes = new AmmoClipCodexScriptable[] {sabotClipCodex, clip_codex_m830};
 
                     FieldInfo totalAmmoCount = typeof(LoadoutManager).GetField("_totalAmmoCount", BindingFlags.NonPublic | BindingFlags.Instance);
                     totalAmmoCount.SetValue(loadoutManager, 40);
@@ -285,7 +328,7 @@ namespace M1A1Abrams
                     {
                         GHPC.Weapons.AmmoRack rack = loadoutManager.RackLoadouts[i].Rack;
                         rack.ClipCapacity = i == 2 ? 4 : 18;
-                        rack.ClipTypes = new AmmoType.AmmoClip[] { clip_m829, clip_m830 };
+                        rack.ClipTypes = new AmmoType.AmmoClip[] {sabotClipCodex.ClipType, clip_m830};
                         EmptyRack(rack);
                     }
 
