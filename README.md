@@ -16,7 +16,7 @@ Converts all M1IPs to M1A1s equipped with:
 	<ul>
 	<li>120mm M256</li>
 	<li>M829 APFSDS-T (22 rounds)</li>
-    	<li>M830 HEAT-MP-T (18 rounds)</li>
+    	<li>M830 HEAT-MP-T (18 rounds, has shoulder fuze)</li>
  	</ul>
 </p>
 
