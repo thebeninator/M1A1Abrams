@@ -25,8 +25,8 @@ Converts all M1IPs to M1A1s equipped with:
 	<ul> 
 		<li>Convert non-IP M1s to M1E1s (disabled by default)</li>
 		<li>Randomize M1A1/E1 conversions (disabled by default) </li>
- 		<li>Customize how many M829 and M830 rounds every M1A1/E1 carries (total 40 rounds)</li>
  		<li>Horizontal sight stabilization for M1A1/E1s when applying lead (disabled by default)</li>
 		<li>Use M829A1 instead of M829 (disabled by default)</li>
+		<li>Customize how many M829 and M830 rounds every M1A1/E1 carries</li>
 	</ul>
 </p>
