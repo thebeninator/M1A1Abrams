@@ -121,7 +121,7 @@ namespace M1A1Abrams
             if (playerManager.CurrentPlayerWeapon.Name != "120mm gun M256") return;
 
             AmmoType currentAmmo = playerManager.CurrentPlayerWeapon.FCS.CurrentAmmoType;
-            int reticleId = (currentAmmo.Name == "M829 APFSDS-T") ? 0 : 2;
+            int reticleId = currentAmmo.Name.Contains("M829") ? 0 : 2;
 
             GameObject reticle = cam.transform.GetChild(reticleId).gameObject;
 
