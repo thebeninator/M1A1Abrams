@@ -121,7 +121,7 @@ namespace M1A1Abrams
             if (playerManager.CurrentPlayerWeapon.Name != "120mm gun M256") return;
 
             AmmoType currentAmmo = playerManager.CurrentPlayerWeapon.FCS.CurrentAmmoType;
-            int reticleId = (currentAmmo.Name == "M829 APFSDS-T") ? 0 : 2;
+            int reticleId = (currentAmmo.Name == "M829 APFSDS-T" || currentAmmo.Name == "M829A1 APFSDS-T") ? 0 : 2;
 
             GameObject reticle = cam.transform.GetChild(reticleId).gameObject;
 
@@ -273,7 +273,7 @@ namespace M1A1Abrams
 
                         ammo_m829a1_vis = GameObject.Instantiate(ammo_m833.VisualModel);
                         ammo_m829a1_vis.name = "M829A1 visual";
-                        ammo_m829a1.VisualModel = ammo_m829_vis;
+                        ammo_m829a1.VisualModel = ammo_m829a1_vis;
                         ammo_m829a1.VisualModel.GetComponent<AmmoStoredVisual>().AmmoType = ammo_m829a1;
                         ammo_m829a1.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m829a1;
 
