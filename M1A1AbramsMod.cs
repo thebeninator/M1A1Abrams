@@ -9,6 +9,8 @@ using GHPC.Vehicle;
 using GHPC.Camera;
 using GHPC.Player;
 using GHPC.Equipment.Optics;
+using System.Collections;
+using System.Threading.Tasks;
 
 namespace M1A1Abrams
 {
@@ -131,14 +133,16 @@ namespace M1A1Abrams
             }
         }
 
-        public override void OnSceneWasInitialized(int buildIndex, string sceneName)
+        public override async void OnSceneWasInitialized(int buildIndex, string sceneName)
         {
-            // note to self: not all vehicles are tagged with "vehicle"
-            //               will not convert retroactively added m1ips to m1a1s 
-
-            if (sceneName == "LOADER_INITIAL" || sceneName == "MainMenu2_Scene") return;
+            if (sceneName == "LOADER_INITIAL" || sceneName == "MainMenu2_Scene" || sceneName == "t64_menu") return;
 
             vic_gos = GameObject.FindGameObjectsWithTag("Vehicle");
+
+            while (vic_gos.Length == 0) {
+                vic_gos = GameObject.FindGameObjectsWithTag("Vehicle");
+                await Task.Delay(3000); 
+            }
 
             if (gun_m256 == null)
             {
@@ -250,10 +254,6 @@ namespace M1A1Abrams
 
                 if (vic.FriendlyName == "M1IP" || (m1e1.Value && vic.FriendlyName == "M1"))
                 {
-                    if (randomChance.Value) {
-                        if (UnityEngine.Random.Range(1, 101) > randomChanceNum.Value) continue; 
-                    }
-
                     gameManager = GameObject.Find("_APP_GHPC_");
                     cameraManager = gameManager.GetComponent<CameraManager>();
                     playerManager = gameManager.GetComponent<PlayerInput>();
@@ -284,65 +284,73 @@ namespace M1A1Abrams
                         ammo_m830.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m830;
                     }
 
-                    // rename to m1a1
-                    string name = (vic.FriendlyName == "M1IP") ? "M1A1" : "M1E1";
+                    int rand = 0;
+                    if (randomChance.Value) rand = UnityEngine.Random.Range(1, 100);
+                    
 
-                    FieldInfo friendlyName = typeof(GHPC.Unit).GetField("_friendlyName", BindingFlags.NonPublic | BindingFlags.Instance);
-                    friendlyName.SetValue(vic, name);
+                    if (rand < randomChanceNum.Value) {
+                        MelonLogger.Msg(rand + " triggered"); 
+                        // rename to m1a1
+                        string name = (vic.FriendlyName == "M1IP") ? "M1A1" : "M1E1";
 
-                    FieldInfo uniqueName = typeof(GHPC.Unit).GetField("_uniqueName", BindingFlags.NonPublic | BindingFlags.Instance);
-                    uniqueName.SetValue(vic, name);
+                        FieldInfo friendlyName = typeof(GHPC.Unit).GetField("_friendlyName", BindingFlags.NonPublic | BindingFlags.Instance);
+                        friendlyName.SetValue(vic, name);
 
-                    // convert to m256 gun
-                    WeaponsManager weaponsManager = vic.GetComponent<WeaponsManager>();
-                    WeaponSystemInfo mainGunInfo = weaponsManager.Weapons[0];
-                    WeaponSystem mainGun = mainGunInfo.Weapon;
+                        FieldInfo uniqueName = typeof(GHPC.Unit).GetField("_uniqueName", BindingFlags.NonPublic | BindingFlags.Instance);
+                        uniqueName.SetValue(vic, name);
 
-                    if (rotateAzimuth.Value) {
-                        UsableOptic primaryOptic = vic_go.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/GPS/Optic").gameObject.GetComponent<UsableOptic>();
-                        primaryOptic.RotateAzimuth = true;
-                        primaryOptic.slot.LinkedNightSight.PairedOptic.RotateAzimuth = true; 
+                        // convert to m256 gun
+                        WeaponsManager weaponsManager = vic.GetComponent<WeaponsManager>();
+                        WeaponSystemInfo mainGunInfo = weaponsManager.Weapons[0];
+                        WeaponSystem mainGun = mainGunInfo.Weapon;
+
+                        if (rotateAzimuth.Value)
+                        {
+                            UsableOptic primaryOptic = vic_go.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/GPS/Optic").gameObject.GetComponent<UsableOptic>();
+                            primaryOptic.RotateAzimuth = true;
+                            primaryOptic.slot.LinkedNightSight.PairedOptic.RotateAzimuth = true;
+                        }
+
+                        mainGunInfo.Name = "120mm gun M256";
+                        mainGun.Impulse = 68000;
+                        FieldInfo codex = typeof(WeaponSystem).GetField("CodexEntry", BindingFlags.NonPublic | BindingFlags.Instance);
+                        codex.SetValue(mainGun, gun_m256);
+
+                        GameObject gunTube = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/gun_recoil").gameObject;
+                        gunTube.transform.localScale = new Vector3(1.4f, 1.4f, 0.98f);
+
+                        // convert ammo
+                        LoadoutManager loadoutManager = vic.GetComponent<LoadoutManager>();
+
+                        loadoutManager.TotalAmmoCounts = new int[] { m829Count.Value, m830Count.Value };
+
+                        AmmoClipCodexScriptable sabotClipCodex = (useSuperSabot.Value) ? clip_codex_m829a1 : clip_codex_m829;
+
+                        loadoutManager.LoadedAmmoTypes = new AmmoClipCodexScriptable[] { sabotClipCodex, clip_codex_m830 };
+
+                        FieldInfo totalAmmoCount = typeof(LoadoutManager).GetField("_totalAmmoCount", BindingFlags.NonPublic | BindingFlags.Instance);
+                        totalAmmoCount.SetValue(loadoutManager, 40);
+
+                        for (int i = 0; i <= 2; i++)
+                        {
+                            GHPC.Weapons.AmmoRack rack = loadoutManager.RackLoadouts[i].Rack;
+                            rack.ClipCapacity = i == 2 ? 4 : 18;
+                            rack.ClipTypes = new AmmoType.AmmoClip[] { sabotClipCodex.ClipType, clip_m830 };
+                            EmptyRack(rack);
+                        }
+
+                        loadoutManager.SpawnCurrentLoadout();
+
+                        PropertyInfo roundInBreech = typeof(AmmoFeed).GetProperty("AmmoTypeInBreech"); // clear preloaded M833 from breech
+                        roundInBreech.SetValue(mainGun.Feed, null);
+
+                        MethodInfo refreshBreech = typeof(AmmoFeed).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic); // silently load M829
+                        refreshBreech.Invoke(mainGun.Feed, new object[] { });
+
+                        // update ballistics computer
+                        MethodInfo registerAllBallistics = typeof(LoadoutManager).GetMethod("RegisterAllBallistics", BindingFlags.Instance | BindingFlags.NonPublic);
+                        registerAllBallistics.Invoke(loadoutManager, new object[] { });
                     }
-
-                    mainGunInfo.Name = "120mm gun M256";
-                    mainGun.Impulse = 68000;
-                    FieldInfo codex = typeof(WeaponSystem).GetField("CodexEntry", BindingFlags.NonPublic | BindingFlags.Instance);
-                    codex.SetValue(mainGun, gun_m256);
-
-                    GameObject gunTube = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/gun_recoil").gameObject;
-                    gunTube.transform.localScale = new Vector3(1.4f, 1.4f, 0.98f);
-
-                    // convert ammo
-                    LoadoutManager loadoutManager = vic.GetComponent<LoadoutManager>();
-
-                    loadoutManager.TotalAmmoCounts = new int[] { m829Count.Value, m830Count.Value };
-
-                    AmmoClipCodexScriptable sabotClipCodex = (useSuperSabot.Value) ? clip_codex_m829a1 : clip_codex_m829;
-
-                    loadoutManager.LoadedAmmoTypes = new AmmoClipCodexScriptable[] {sabotClipCodex, clip_codex_m830};
-
-                    FieldInfo totalAmmoCount = typeof(LoadoutManager).GetField("_totalAmmoCount", BindingFlags.NonPublic | BindingFlags.Instance);
-                    totalAmmoCount.SetValue(loadoutManager, 40);
-
-                    for (int i = 0; i <= 2; i++)
-                    {
-                        GHPC.Weapons.AmmoRack rack = loadoutManager.RackLoadouts[i].Rack;
-                        rack.ClipCapacity = i == 2 ? 4 : 18;
-                        rack.ClipTypes = new AmmoType.AmmoClip[] {sabotClipCodex.ClipType, clip_m830};
-                        EmptyRack(rack);
-                    }
-
-                    loadoutManager.SpawnCurrentLoadout();
-
-                    PropertyInfo roundInBreech = typeof(AmmoFeed).GetProperty("AmmoTypeInBreech"); // clear preloaded M833 from breech
-                    roundInBreech.SetValue(mainGun.Feed, null);
-
-                    MethodInfo refreshBreech = typeof(AmmoFeed).GetMethod("Start", BindingFlags.Instance | BindingFlags.NonPublic); // silently load M829
-                    refreshBreech.Invoke(mainGun.Feed, new object[] { });
-
-                    // update ballistics computer
-                    MethodInfo registerAllBallistics = typeof(LoadoutManager).GetMethod("RegisterAllBallistics", BindingFlags.Instance | BindingFlags.NonPublic);
-                    registerAllBallistics.Invoke(loadoutManager, new object[] { });
                 }
             }
         }
