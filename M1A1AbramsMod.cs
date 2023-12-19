@@ -50,45 +50,6 @@ namespace M1A1Abrams
         AmmoType ammo_m833;
         AmmoType ammo_m456;
 
-        // https://snipplr.com/view/75285/clone-from-one-object-to-another-using-reflection
-        public static void ShallowCopy(System.Object dest, System.Object src)
-        {
-            BindingFlags flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-            FieldInfo[] destFields = dest.GetType().GetFields(flags);
-            FieldInfo[] srcFields = src.GetType().GetFields(flags);
-
-            foreach (FieldInfo srcField in srcFields)
-            {
-                FieldInfo destField = destFields.FirstOrDefault(field => field.Name == srcField.Name);
-
-                if (destField != null && !destField.IsLiteral)
-                {
-                    if (srcField.FieldType == destField.FieldType)
-                        destField.SetValue(dest, srcField.GetValue(src));
-                }
-            }
-        }
-
-        public static void EmptyRack(GHPC.Weapons.AmmoRack rack)
-        {
-            MethodInfo removeVis = typeof(GHPC.Weapons.AmmoRack).GetMethod("RemoveAmmoVisualFromSlot", BindingFlags.Instance | BindingFlags.NonPublic);
-
-            PropertyInfo stored_clips = typeof(GHPC.Weapons.AmmoRack).GetProperty("StoredClips");
-            stored_clips.SetValue(rack, new List<AmmoType.AmmoClip>());
-
-            rack.SlotIndicesByAmmoType = new Dictionary<AmmoType, List<byte>>();
-
-            foreach (Transform transform in rack.VisualSlots)
-            {
-                AmmoStoredVisual vis = transform.GetComponentInChildren<AmmoStoredVisual>();
-
-                if (vis != null && vis.AmmoType != null)
-                {
-                    removeVis.Invoke(rack, new object[] { transform });
-                }
-            }
-        }
-
         public override void OnInitializeMelon()
         {
             cfg = MelonPreferences.CreateCategory("M1A1Config");
@@ -146,7 +107,6 @@ namespace M1A1Abrams
 
             if (gun_m256 == null)
             {
-
                 foreach (AmmoCodexScriptable s in Resources.FindObjectsOfTypeAll(typeof(AmmoCodexScriptable)))
                 {
                     if (s.AmmoType.Name == "M833 APFSDS-T")
@@ -169,7 +129,7 @@ namespace M1A1Abrams
 
                 // m829 
                 ammo_m829 = new AmmoType();
-                ShallowCopy(ammo_m829, ammo_m833);
+                Util.ShallowCopy(ammo_m829, ammo_m833);
                 ammo_m829.Name = "M829 APFSDS-T";
                 ammo_m829.Caliber = 120;
                 ammo_m829.RhaPenetration = 600;
@@ -194,7 +154,7 @@ namespace M1A1Abrams
 
                 // m829a1
                 ammo_m829a1 = new AmmoType();
-                ShallowCopy(ammo_m829a1, ammo_m833);
+                Util.ShallowCopy(ammo_m829a1, ammo_m833);
                 ammo_m829a1.Name = "M829A1 APFSDS-T";
                 ammo_m829a1.Caliber = 120;
                 ammo_m829a1.RhaPenetration = 700;
@@ -219,7 +179,7 @@ namespace M1A1Abrams
 
                 // m830
                 ammo_m830 = new AmmoType();
-                ShallowCopy(ammo_m830, ammo_m456);
+                Util.ShallowCopy(ammo_m830, ammo_m456);
                 ammo_m830.Name = "M830 HEAT-MP-T";
                 ammo_m830.Caliber = 120;
                 ammo_m830.RhaPenetration = 480;
@@ -287,9 +247,7 @@ namespace M1A1Abrams
                     int rand = 0;
                     if (randomChance.Value) rand = UnityEngine.Random.Range(1, 100);
                     
-
                     if (rand < randomChanceNum.Value) {
-                        MelonLogger.Msg(rand + " triggered"); 
                         // rename to m1a1
                         string name = (vic.FriendlyName == "M1IP") ? "M1A1" : "M1E1";
 
@@ -306,10 +264,15 @@ namespace M1A1Abrams
 
                         if (rotateAzimuth.Value)
                         {
-                            UsableOptic primaryOptic = vic_go.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/GPS/Optic").gameObject.GetComponent<UsableOptic>();
-                            primaryOptic.RotateAzimuth = true;
-                            primaryOptic.slot.LinkedNightSight.PairedOptic.RotateAzimuth = true;
+                            UsableOptic optic = Util.GetDayOptic(mainGun.FCS);
+                            optic.RotateAzimuth = true;
+                            optic.slot.LinkedNightSight.PairedOptic.RotateAzimuth = true;
                         }
+
+                        Transform muzzleFlashes = mainGun.MuzzleEffects[1].transform;
+                        muzzleFlashes.GetChild(1).transform.localScale = new Vector3(2f, 2f, 2f);
+                        muzzleFlashes.GetChild(2).transform.localScale = new Vector3(2f, 2f, 2f);
+                        muzzleFlashes.GetChild(4).transform.localScale = new Vector3(2f, 2f, 2f);
 
                         mainGunInfo.Name = "120mm gun M256";
                         mainGun.Impulse = 68000;
@@ -336,7 +299,7 @@ namespace M1A1Abrams
                             GHPC.Weapons.AmmoRack rack = loadoutManager.RackLoadouts[i].Rack;
                             rack.ClipCapacity = i == 2 ? 4 : 18;
                             rack.ClipTypes = new AmmoType.AmmoClip[] { sabotClipCodex.ClipType, clip_m830 };
-                            EmptyRack(rack);
+                            Util.EmptyRack(rack);
                         }
 
                         loadoutManager.SpawnCurrentLoadout();
