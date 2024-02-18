@@ -10,8 +10,11 @@ using System.Collections;
 using UnityEngine;
 using GHPC.Camera;
 using GHPC.Player;
+using FMODUnity;
+using FMOD;
+using FMODUnityResonance;
 
-[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.0.9", "ATLAS")]
+[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.1.0", "ATLAS")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace M1A1Abrams
@@ -22,7 +25,6 @@ namespace M1A1Abrams
         public static GameObject gameManager;
         public static CameraManager camManager;
         public static PlayerInput playerManager;
-
 
         public IEnumerator GetVics(GameState _)
         {
@@ -49,8 +51,9 @@ namespace M1A1Abrams
             camManager = gameManager.GetComponent<CameraManager>();
             playerManager = gameManager.GetComponent<PlayerInput>();
 
-            StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(GetVics), GameStatePriority.Low);
+            StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(GetVics), GameStatePriority.Medium);
             M1A1.Init();
+            MPAT.Init();
         }
     }
 }
