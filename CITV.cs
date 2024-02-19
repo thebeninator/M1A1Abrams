@@ -10,21 +10,76 @@ using Reticle;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 using MelonLoader;
+using MelonLoader.Utils;
+using System.IO;
 
 namespace M1A1Abrams
 {
+    public class CITVCrosshair : MonoBehaviour {
+        private CameraManager cam_manager;
+        private Transform canvas;
+
+        void Awake() {
+            cam_manager = GameObject.Find("_APP_GHPC_").GetComponent<CameraManager>();
+            canvas = GameObject.Find("_APP_GHPC_").transform.Find("UIHUDCanvas");
+        }
+
+        void Update() {
+            if (cam_manager._currentCamSlot != null && cam_manager._currentCamSlot.gameObject.GetComponent<CITV>() != null)
+            {
+                gameObject.GetComponent<UnityEngine.UI.Image>().enabled = true;
+                canvas.Find("3P aim reticle").gameObject.SetActive(false);
+            }
+            else {    
+                gameObject.GetComponent<UnityEngine.UI.Image>().enabled = false;
+                canvas.Find("3P aim reticle").gameObject.SetActive(true);
+            }
+        }
+    } 
+
     public class CITV : MonoBehaviour
     {
-        private GHPC.Camera.BufferedCameraFollow camera;
+        private static GHPC.Camera.BufferedCameraFollow camera;
+        private static Sprite citv_crosshair;
+        private static GameObject citv_crosshair_go;
+        private static GameObject active_crosshair_instance;
         private CameraSlot nods;
         private int id;
         private float curr_sens = 5f;
 
+        public static void Init() {
+            if (citv_crosshair == null)
+            {
+                var citv_bundle = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1CITV/", "citv_crosshair"));
+
+                citv_crosshair = citv_bundle.LoadAsset<Sprite>("citv_crosshair");
+                citv_crosshair.hideFlags = HideFlags.DontUnloadUnusedAsset;
+
+                citv_crosshair_go = new GameObject("citv crosshair canvas");
+                citv_crosshair_go.AddComponent<CanvasRenderer>();
+                citv_crosshair_go.AddComponent<CITVCrosshair>();
+                UnityEngine.UI.Image s = citv_crosshair_go.AddComponent<UnityEngine.UI.Image>();
+                s.sprite = citv_crosshair;
+            }
+        }
+
         void Awake() {
-            camera = GameObject.Find("_APP_GHPC_").GetComponent<CameraManager>().CameraFollow;
+            if (camera == null)
+                camera = GameObject.Find("_APP_GHPC_").GetComponent<CameraManager>().CameraFollow;
 
             nods = gameObject.GetComponent<CameraSlot>();
             id = gameObject.GetInstanceID();
+
+            var canvas = GameObject.Find("_APP_GHPC_").transform.Find("UIHUDCanvas");
+
+            if (active_crosshair_instance == null && M1A1.citv_reticle.Value) {
+                active_crosshair_instance = GameObject.Instantiate(citv_crosshair_go, canvas);
+                active_crosshair_instance.transform.localPosition = new Vector3(0f, 0f, 572f);
+                active_crosshair_instance.transform.localEulerAngles = new Vector3(0f, 0f, 0f);
+                active_crosshair_instance.transform.localScale = new Vector3(6f, 3f, 1f);
+                active_crosshair_instance.GetComponent<UnityEngine.UI.Image>().enabled = false;
+                active_crosshair_instance.transform.SetAsFirstSibling();
+            }
 
             nods.gameObject.transform.localPosition = new Vector3(-1.0409f, -0.272f, 1.264f);
             nods.VisionType = NightVisionType.Thermal;
@@ -46,7 +101,7 @@ namespace M1A1Abrams
             bloom.intensity.value = 1f;
             bloom.softKnee.value = 0.4f;
             bloom.softKnee.overrideState = true;
-            bloom.threshold.value = 0.86f;
+            bloom.threshold.value = 0.55f;
             bloom.threshold.overrideState = true;
             grain.intensity.value = 0.2f;
             grain.size.value = 0.1f;
@@ -62,7 +117,7 @@ namespace M1A1Abrams
             if (camera.commanderHead.gameObject.GetInstanceID() != id)
                 return;
 
-            curr_sens = 3.5f * (nods.CurrentFov / 60f);
+            curr_sens = 1.5f * (nods.CurrentFov / 60f);
             camera.aimSensitivity3P = curr_sens;
         }
     }

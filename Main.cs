@@ -14,7 +14,7 @@ using FMODUnity;
 using FMOD;
 using FMODUnityResonance;
 
-[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.1.0", "ATLAS")]
+[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.1.1", "ATLAS")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace M1A1Abrams
@@ -52,6 +52,7 @@ namespace M1A1Abrams
             playerManager = gameManager.GetComponent<PlayerInput>();
 
             StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(GetVics), GameStatePriority.Medium);
+            CITV.Init();
             M1A1.Init();
             MPAT.Init();
         }

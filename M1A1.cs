@@ -27,6 +27,7 @@ using NWH.VehiclePhysics;
 using static Reticle.ReticleTree;
 using GHPC.Utility;
 using UnityEngine.Rendering.PostProcessing;
+using System.IO;
 
 namespace M1A1Abrams
 {
@@ -42,6 +43,8 @@ namespace M1A1Abrams
         static MelonPreferences_Entry<bool> useSuperHeat;
         static MelonPreferences_Entry<bool> citv;
         public static MelonPreferences_Entry<bool> perfect_citv;
+        static MelonPreferences_Entry<bool> alt_flir_colour;
+        public static MelonPreferences_Entry<bool> citv_reticle;
 
         static WeaponSystemCodexScriptable gun_m256;
 
@@ -107,6 +110,10 @@ namespace M1A1Abrams
             citv = cfg.CreateEntry<bool>("CITV", false);
             citv.Description = "Replaces commander's NVGs with variable-zoom thermals.";
             perfect_citv = cfg.CreateEntry<bool>("No Blur CITV", false);
+            citv_reticle = cfg.CreateEntry<bool>("CITV Reticle", true);
+
+            alt_flir_colour = cfg.CreateEntry<bool>("Alternate GPS FLIR Colour", false);
+            alt_flir_colour.Description = "[Requires CITV to be enabled] Gives the gunner's sight FLIR the same colour palette as the CITV.";
 
             m1e1 = cfg.CreateEntry<bool>("M1E1", false);
             m1e1.Description = "Convert M1s to M1E1s (i.e: they get the 120mm gun).";
@@ -141,10 +148,10 @@ namespace M1A1Abrams
                     WeaponsManager weaponsManager = vic.GetComponent<WeaponsManager>();
                     WeaponSystemInfo mainGunInfo = weaponsManager.Weapons[0];
                     WeaponSystem mainGun = mainGunInfo.Weapon;
+                    UsableOptic optic = Util.GetDayOptic(mainGun.FCS);
 
                     if (rotateAzimuth.Value)
                     {
-                        UsableOptic optic = Util.GetDayOptic(mainGun.FCS);
                         optic.RotateAzimuth = true;
                         optic.slot.LinkedNightSight.PairedOptic.RotateAzimuth = true;
                         optic.slot.VibrationShakeMultiplier = 0f;
@@ -154,6 +161,15 @@ namespace M1A1Abrams
                     if (citv.Value)
                     {
                         vic.DesignatedCameraSlots[0].LinkedNightSight.gameObject.AddComponent<CITV>();
+
+                        if (alt_flir_colour.Value)
+                            optic.slot.LinkedNightSight.PairedOptic.post.profile.settings[2] = vic.DesignatedCameraSlots[0].LinkedNightSight.gameObject.
+                                GetComponent<SimpleNightVision>()._postVolume.profile.settings[1];
+                        //ChromaticAberration s = optic.post.profile.AddSettings<ChromaticAberration>();
+                        //s.active = true; 
+                        //s.intensity.overrideState = true;
+                        //s.intensity.value = 0.35f;
+
                         vic._friendlyName += "+";
                     }
 
