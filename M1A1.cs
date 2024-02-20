@@ -165,14 +165,14 @@ namespace M1A1Abrams
                         if (alt_flir_colour.Value)
                             optic.slot.LinkedNightSight.PairedOptic.post.profile.settings[2] = vic.DesignatedCameraSlots[0].LinkedNightSight.gameObject.
                                 GetComponent<SimpleNightVision>()._postVolume.profile.settings[1];
-                        //ChromaticAberration s = optic.post.profile.AddSettings<ChromaticAberration>();
-                        //s.active = true; 
-                        //s.intensity.overrideState = true;
-                        //s.intensity.value = 0.35f;
+                        ChromaticAberration s = optic.post.profile.AddSettings<ChromaticAberration>();
+                        s.active = true; 
+                        s.intensity.overrideState = true;
+                        s.intensity.value = 0.35f;
 
                         vic._friendlyName += "+";
                     }
-
+                    
                     if (reticleSO_ap == null)
                     {
                         reticleSO_ap = ScriptableObject.Instantiate(ReticleMesh.cachedReticles["M1_105_GAS_APFSDS"].tree);
@@ -181,15 +181,15 @@ namespace M1A1Abrams
                         Util.ShallowCopy(reticle_cached_ap, ReticleMesh.cachedReticles["M1_105_GAS_APFSDS"]);
                         reticle_cached_ap.tree = reticleSO_ap;
 
-                        ReticleTree.VerticalBallistic reticle_range_ap = (reticleSO_ap.planes[0]
-                            as ReticleTree.FocalPlane).elements[1]
-                            as ReticleTree.VerticalBallistic;
+                        ReticleTree.Angular boresight = ((reticleSO_ap.planes[0]
+                            as ReticleTree.FocalPlane).elements[0]
+                            as ReticleTree.Angular);
+
+                        ReticleTree.VerticalBallistic reticle_range_ap = boresight.elements[4] as ReticleTree.VerticalBallistic;
                         reticle_range_ap.projectile = (useSuperSabot.Value) ? ammo_codex_m829a1 : ammo_codex_m829;
                         reticle_range_ap.UpdateBC();
 
-                        ReticleTree.Text reticle_text_ap = (((reticleSO_ap.planes[0]
-                            as ReticleTree.FocalPlane).elements[0])
-                            as ReticleTree.Angular).elements[0]
+                        ReticleTree.Text reticle_text_ap = boresight.elements[0]
                             as ReticleTree.Text;
 
                         string ap_name = (useSuperSabot.Value) ? "M829A1" : "M829";
@@ -201,15 +201,16 @@ namespace M1A1Abrams
                         Util.ShallowCopy(reticle_cached_heat, ReticleMesh.cachedReticles["M1_105_GAS_HEAT"]);
                         reticle_cached_heat.tree = reticleSO_heat;
 
-                        ReticleTree.VerticalBallistic reticle_range_heat = (reticleSO_heat.planes[0]
-                            as ReticleTree.FocalPlane).elements[1]
+                        ReticleTree.Angular boresight_heat = ((reticleSO_heat.planes[0]
+                            as ReticleTree.FocalPlane).elements[0]
+                            as ReticleTree.Angular);
+
+                        ReticleTree.VerticalBallistic reticle_range_heat = boresight_heat.elements[4]
                             as ReticleTree.VerticalBallistic;
                         reticle_range_heat.projectile = (useSuperHeat.Value) ? ammo_codex_m830a1 : ammo_codex_m830;
                         reticle_range_heat.UpdateBC();
 
-                        ReticleTree.Text reticle_text_heat = (((reticleSO_heat.planes[0]
-                            as ReticleTree.FocalPlane).elements[0])
-                            as ReticleTree.Angular).elements[0]
+                        ReticleTree.Text reticle_text_heat = boresight_heat.elements[0]
                             as ReticleTree.Text;
 
                         string heat_name = (useSuperHeat.Value) ? "MPAT-T" : "HEAT-MP-T";
@@ -227,6 +228,7 @@ namespace M1A1Abrams
                     gas_heat.reticle = reticle_cached_heat;
                     gas_heat.SMR = null;
                     gas_heat.Load();
+                    
 
                     Transform muzzleFlashes = mainGun.MuzzleEffects[1].transform;
                     muzzleFlashes.GetChild(1).transform.localScale = new Vector3(1.3f, 1.3f, 1f);
@@ -318,7 +320,7 @@ namespace M1A1Abrams
                 Util.ShallowCopy(ammo_m829, ammo_m833);
                 ammo_m829.Name = "M829 APFSDS-T";
                 ammo_m829.Caliber = 120;
-                ammo_m829.RhaPenetration = 600;
+                ammo_m829.RhaPenetration = 570f;
                 ammo_m829.MuzzleVelocity = 1670f;
                 ammo_m829.Mass = 3.9f;
                 ammo_m829.SectionalArea = 0.0009f;
@@ -344,10 +346,11 @@ namespace M1A1Abrams
                 Util.ShallowCopy(ammo_m829a1, ammo_m833);
                 ammo_m829a1.Name = "M829A1 APFSDS-T";
                 ammo_m829a1.Caliber = 120;
-                ammo_m829a1.RhaPenetration = 690;
+                ammo_m829a1.RhaPenetration = 650;
+                ammo_m829a1.SpallMultiplier = 1.2f;
                 ammo_m829a1.MuzzleVelocity = 1575;
                 ammo_m829a1.Mass = 4.6f;
-                ammo_m829a1.SectionalArea = 0.0009f;
+                ammo_m829a1.SectionalArea = 0.00082f;
 
                 ammo_codex_m829a1 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_m829a1.AmmoType = ammo_m829a1;
@@ -530,7 +533,7 @@ namespace M1A1Abrams
                 ammo_m1028.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m1028;
             }
 
-            StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(Convert), GameStatePriority.Medium);
+            StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(Convert), GameStatePriority.Low);
         }
     }
 
