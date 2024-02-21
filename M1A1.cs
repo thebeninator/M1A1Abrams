@@ -42,9 +42,11 @@ namespace M1A1Abrams
         static MelonPreferences_Entry<bool> useSuperSabot;
         static MelonPreferences_Entry<bool> useSuperHeat;
         static MelonPreferences_Entry<bool> citv;
-        public static MelonPreferences_Entry<bool> perfect_citv;
         static MelonPreferences_Entry<bool> alt_flir_colour;
+        public static MelonPreferences_Entry<bool> perfect_citv;
         public static MelonPreferences_Entry<bool> citv_reticle;
+        public static MelonPreferences_Entry<bool> citv_smooth;
+        public static MelonPreferences_Entry<bool> perfect_override;
 
         static WeaponSystemCodexScriptable gun_m256;
 
@@ -109,8 +111,15 @@ namespace M1A1Abrams
 
             citv = cfg.CreateEntry<bool>("CITV", false);
             citv.Description = "Replaces commander's NVGs with variable-zoom thermals.";
+
             perfect_citv = cfg.CreateEntry<bool>("No Blur CITV", false);
             citv_reticle = cfg.CreateEntry<bool>("CITV Reticle", true);
+
+            perfect_override = cfg.CreateEntry<bool>("Perfect CITV Override", false);
+            perfect_override.Comment = "Basically lets you point-n-shoot with the CITV.";
+
+            citv_smooth = cfg.CreateEntry<bool>("Smooth CITV Panning", true);
+            citv_smooth.Comment = "Makes CITV feel more like a camera.";
 
             alt_flir_colour = cfg.CreateEntry<bool>("Alternate GPS FLIR Colour", false);
             alt_flir_colour.Description = "[Requires CITV to be enabled] Gives the gunner's sight FLIR the same colour palette as the CITV.";
@@ -533,7 +542,7 @@ namespace M1A1Abrams
                 ammo_m1028.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m1028;
             }
 
-            StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(Convert), GameStatePriority.Low);
+            StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(Convert), GameStatePriority.Medium);
         }
     }
 

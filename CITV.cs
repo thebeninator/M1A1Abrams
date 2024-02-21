@@ -12,27 +12,45 @@ using UnityEngine.Rendering.PostProcessing;
 using MelonLoader;
 using MelonLoader.Utils;
 using System.IO;
+using GHPC.Weapons;
+using System.Reflection;
+using GHPC.Utility;
 
 namespace M1A1Abrams
 {
     public class CITVCrosshair : MonoBehaviour {
         private CameraManager cam_manager;
+        private PlayerInput player_manager;
         private Transform canvas;
+        private FieldInfo snapp;
 
         void Awake() {
             cam_manager = GameObject.Find("_APP_GHPC_").GetComponent<CameraManager>();
+            player_manager = GameObject.Find("_APP_GHPC_").GetComponent<PlayerInput>();
             canvas = GameObject.Find("_APP_GHPC_").transform.Find("UIHUDCanvas");
+
+            snapp = typeof(GHPC.Camera.BufferedCameraFollow).GetField("SNAPPINESS", BindingFlags.Static | BindingFlags.NonPublic);
         }
 
-        void Update() {
+        void LateUpdate() {
             if (cam_manager._currentCamSlot != null && cam_manager._currentCamSlot.gameObject.GetComponent<CITV>() != null)
             {
                 gameObject.GetComponent<UnityEngine.UI.Image>().enabled = true;
                 canvas.Find("3P aim reticle").gameObject.SetActive(false);
+      
+                if (M1A1.citv_smooth.Value)
+                    snapp.SetValue(null, 0.22f);
+
+                if (M1A1.perfect_override.Value && InputUtil.MainPlayer.GetButton("Smooth Aim")) {
+                    FireControlSystem fcs = player_manager.CurrentPlayerWeapon.Weapon.FCS;
+                    fcs.SetAimWorldPosition(cam_manager.CameraFollow.CurrentAimPoint);
+                }
             }
             else {    
                 gameObject.GetComponent<UnityEngine.UI.Image>().enabled = false;
                 canvas.Find("3P aim reticle").gameObject.SetActive(true);
+
+                snapp.SetValue(null, 10f);
             }
         }
     } 
@@ -84,7 +102,7 @@ namespace M1A1Abrams
             nods.gameObject.transform.localPosition = new Vector3(-1.0409f, -0.272f, 1.264f);
             nods.VisionType = NightVisionType.Thermal;
             nods.IsExterior = false;
-            nods.BaseBlur = M1A1.perfect_citv.Value ? 0f : 0.001f;
+            nods.BaseBlur = M1A1.perfect_citv.Value ? 0f : 0.05f;
             nods.OtherFovs = new float[] {40f, 30f, 20f, 10f, 4f, 3.25f};
             nods.SpriteType = CameraSpriteManager.SpriteType.DefaultScope;
             PostProcessProfile nods_profile = nods.gameObject.GetComponent<SimpleNightVision>()._postVolume.profile;
