@@ -34,3 +34,5 @@ Converts all M1IPs to M1A1s equipped with:
 		<li>Customize how many M829 and M830 rounds every M1A1/E1 carries</li>
 	</ul>
 </p>
+
+CITV model pulled from: "WIP - Abrams M1A2 TUSK 2" (https://skfb.ly/VUwX) by DavidFalke
