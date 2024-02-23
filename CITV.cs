@@ -32,14 +32,14 @@ namespace M1A1Abrams
             snapp = typeof(GHPC.Camera.BufferedCameraFollow).GetField("SNAPPINESS", BindingFlags.Static | BindingFlags.NonPublic);
         }
 
-        void LateUpdate() {
+        void Update() {
             if (cam_manager._currentCamSlot != null && cam_manager._currentCamSlot.gameObject.GetComponent<CITV>() != null)
             {
                 gameObject.GetComponent<UnityEngine.UI.Image>().enabled = true;
                 canvas.Find("3P aim reticle").gameObject.SetActive(false);
       
                 if (M1A1.citv_smooth.Value)
-                    snapp.SetValue(null, 0.22f);
+                    snapp.SetValue(null, 0.25f);
 
                 if (M1A1.perfect_override.Value && InputUtil.MainPlayer.GetButton("Smooth Aim")) {
                     FireControlSystem fcs = player_manager.CurrentPlayerWeapon.Weapon.FCS;
@@ -50,7 +50,8 @@ namespace M1A1Abrams
                 gameObject.GetComponent<UnityEngine.UI.Image>().enabled = false;
                 canvas.Find("3P aim reticle").gameObject.SetActive(true);
 
-                snapp.SetValue(null, 10f);
+                if (M1A1.citv_smooth.Value)
+                    snapp.SetValue(null, 10f);
             }
         }
     } 
@@ -61,6 +62,7 @@ namespace M1A1Abrams
         private static Sprite citv_crosshair;
         private static GameObject citv_crosshair_go;
         private static GameObject active_crosshair_instance;
+        public GameObject model; 
         private CameraSlot nods;
         private int id;
         private float curr_sens = 5f;
@@ -94,12 +96,12 @@ namespace M1A1Abrams
                 active_crosshair_instance = GameObject.Instantiate(citv_crosshair_go, canvas);
                 active_crosshair_instance.transform.localPosition = new Vector3(0f, 0f, 572f);
                 active_crosshair_instance.transform.localEulerAngles = new Vector3(0f, 0f, 0f);
-                active_crosshair_instance.transform.localScale = new Vector3(6f, 3f, 1f);
+                active_crosshair_instance.transform.localScale = new Vector3(6f, 3.1f, 1f);
                 active_crosshair_instance.GetComponent<UnityEngine.UI.Image>().enabled = false;
                 active_crosshair_instance.transform.SetAsFirstSibling();
             }
 
-            nods.gameObject.transform.localPosition = new Vector3(-1.0409f, -0.272f, 1.264f);
+            nods.gameObject.transform.localPosition = new Vector3(-1.1638f, -0.3435f, 1.2273f);
             nods.VisionType = NightVisionType.Thermal;
             nods.IsExterior = false;
             nods.BaseBlur = M1A1.perfect_citv.Value ? 0f : 0.05f;
@@ -128,15 +130,20 @@ namespace M1A1Abrams
         void Update() {
             if (camera.commanderHead == null || camera.commanderHead.GetComponent<CITV>() == null)
             {
+                model.SetActive(true);
                 camera.aimSensitivity3P = 5f;
                 return;
             }
 
             if (camera.commanderHead.gameObject.GetInstanceID() != id)
+            {
+                model.SetActive(true);
                 return;
+            }
 
             curr_sens = 1.5f * (nods.CurrentFov / 60f);
             camera.aimSensitivity3P = curr_sens;
+            model.SetActive(false);
         }
     }
 }
