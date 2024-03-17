@@ -18,6 +18,7 @@ using GHPC.Utility;
 using System.IO;
 using GHPC.Equipment;
 using GHPC;
+using Thermals;
 
 namespace M1A1Abrams
 {
@@ -91,6 +92,7 @@ namespace M1A1Abrams
         public static AmmoType canister_ball = AmmoType.CopyOf(GHPC.Weapons.LiveRound.SpallAmmoType);
 
         static GameObject citv_obj;
+        static GameObject m256_obj;
 
         static Dictionary<string, AmmoClipCodexScriptable> ap;
         static Dictionary<string, AmmoClipCodexScriptable> heat;
@@ -294,7 +296,11 @@ namespace M1A1Abrams
                 mainGun.CodexEntry = gun_m256;
 
                 GameObject gunTube = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/gun_recoil").gameObject;
-                gunTube.transform.localScale = new Vector3(1.45f, 1.45f, 0.98f);
+                gunTube.transform.localScale = new Vector3(0f, 0f, 0f);
+                LateFollow tube_follower = gunTube.GetComponent<LateFollowTarget>()._lateFollowers[0];
+                GameObject.Destroy(tube_follower.transform.Find("Gun Breech.001").gameObject);
+                GameObject _m256_obj = GameObject.Instantiate(m256_obj, tube_follower.transform);
+                _m256_obj.transform.localPosition = new Vector3(0f, 0.05f, -1.7961f);
 
                 // convert ammo
                 LoadoutManager loadoutManager = vic.GetComponent<LoadoutManager>();
@@ -318,7 +324,7 @@ namespace M1A1Abrams
             
             yield break;
         }
-
+        
         public static void LateUpdate()
         {
             if (M1A1AbramsMod.gameManager == null) return;
@@ -327,10 +333,14 @@ namespace M1A1Abrams
 
             if (cam == null) return;
             if (cam.name != "Aux sight (GAS)") return;
-            if (M1A1AbramsMod.playerManager.CurrentPlayerWeapon.Name != "120mm gun M256") return;
 
-            AmmoType currentAmmo = M1A1AbramsMod.playerManager.CurrentPlayerWeapon.FCS.CurrentAmmoType;
-            int reticleId = currentAmmo.Name.Contains("M829") ? 0 : 2;
+            if (M1A1AbramsMod.playerManager.CurrentPlayerUnit.WeaponsManager.Weapons[0].Name != "120mm gun M256") return;
+
+            AmmoType currentAmmo = M1A1AbramsMod.playerManager.CurrentPlayerUnit.WeaponsManager.Weapons[0].Weapon.Feed.AmmoTypeInBreech;
+
+            if (currentAmmo == null) return;    
+
+            int reticleId = currentAmmo.Name.Contains("M829") || currentAmmo.Name.Contains("M827") ? 0 : 2;
 
             GameObject reticle = cam.transform.GetChild(reticleId).gameObject;
 
@@ -347,17 +357,29 @@ namespace M1A1Abrams
                 citv_obj = bundle.LoadAsset<GameObject>("citv.prefab");
                 citv_obj.hideFlags = HideFlags.DontUnloadUnusedAsset;
                 citv_obj.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+
                 GameObject assem = citv_obj.transform.Find("assembly").gameObject;
                 GameObject glass = citv_obj.transform.Find("glass").gameObject;
 
                 assem.tag = "Penetrable";
                 glass.tag = "Penetrable";
 
+                assem.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
+                glass.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
+                assem.AddComponent<HeatSource>();
+
                 VariableArmor assem_armour = assem.AddComponent<VariableArmor>();
                 VariableArmor glass_armour = glass.AddComponent<VariableArmor>();
                 assem_armour.AverageRha = 40f;
                 assem_armour._name = "CITV";
                 glass_armour._name = "CITV glass";
+
+                var bundle2 = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1CITV/", "m256"));
+                m256_obj = bundle2.LoadAsset<GameObject>("m256.prefab");
+                m256_obj.hideFlags = HideFlags.DontUnloadUnusedAsset;
+                m256_obj.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+                m256_obj.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
+                m256_obj.AddComponent<HeatSource>();
             }
 
             if (gun_m256 == null)
