@@ -35,4 +35,4 @@ Converts all M1IPs to M1A1s equipped with:
 	</ul>
 </p>
 
-CITV model pulled from: "WIP - Abrams M1A2 TUSK 2" (https://skfb.ly/VUwX) by DavidFalke
+CITV & M256 model pulled from: "WIP - Abrams M1A2 TUSK 2" (https://skfb.ly/VUwX) by DavidFalke
