@@ -298,7 +298,7 @@ namespace M1A1Abrams
                 GameObject gunTube = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/gun_recoil").gameObject;
                 gunTube.transform.localScale = new Vector3(0f, 0f, 0f);
                 LateFollow tube_follower = gunTube.GetComponent<LateFollowTarget>()._lateFollowers[0];
-                GameObject.Destroy(tube_follower.transform.Find("Gun Breech.001").gameObject);
+                tube_follower.transform.Find("Gun Breech.001").GetComponent<MeshRenderer>().enabled = false;
                 GameObject _m256_obj = GameObject.Instantiate(m256_obj, tube_follower.transform);
                 _m256_obj.transform.localPosition = new Vector3(0f, 0.05f, -1.7961f);
 
@@ -353,10 +353,10 @@ namespace M1A1Abrams
         public static void Init()
         {
             if (citv_obj == null) {
-                var bundle = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1CITV/", "citv"));
+                var bundle = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1assets/", "citv"));
                 citv_obj = bundle.LoadAsset<GameObject>("citv.prefab");
                 citv_obj.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                citv_obj.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+                citv_obj.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
 
                 GameObject assem = citv_obj.transform.Find("assembly").gameObject;
                 GameObject glass = citv_obj.transform.Find("glass").gameObject;
@@ -367,6 +367,7 @@ namespace M1A1Abrams
                 assem.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
                 glass.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
                 assem.AddComponent<HeatSource>();
+                glass.AddComponent<HeatSource>();
 
                 VariableArmor assem_armour = assem.AddComponent<VariableArmor>();
                 VariableArmor glass_armour = glass.AddComponent<VariableArmor>();
@@ -374,31 +375,16 @@ namespace M1A1Abrams
                 assem_armour._name = "CITV";
                 glass_armour._name = "CITV glass";
 
-                var bundle2 = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1CITV/", "m256"));
+                var bundle2 = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1assets/", "m256"));
                 m256_obj = bundle2.LoadAsset<GameObject>("m256.prefab");
                 m256_obj.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                m256_obj.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+                m256_obj.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
                 m256_obj.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
                 m256_obj.AddComponent<HeatSource>();
             }
 
             if (gun_m256 == null)
             {
-                foreach (AmmoCodexScriptable s in Resources.FindObjectsOfTypeAll(typeof(AmmoCodexScriptable)))
-                {
-                    if (s.AmmoType.Name == "M833 APFSDS-T")
-                    {
-                        ammo_m833 = s.AmmoType;
-                    }
-
-                    if (s.AmmoType.Name == "M456 HEAT-FS-T")
-                    {
-                        ammo_m456 = s.AmmoType;
-                    }
-
-                    if (ammo_m456 != null && ammo_m833 != null) break;
-                }
-
                 foreach (AmmoCodexScriptable s in Resources.FindObjectsOfTypeAll(typeof(AmmoCodexScriptable)))
                 {
                     if (s.AmmoType.Name == "M833 APFSDS-T")
@@ -441,10 +427,11 @@ namespace M1A1Abrams
                 Util.ShallowCopy(ammo_m827, ammo_m833);
                 ammo_m827.Name = "M827 APFSDS-T";
                 ammo_m827.Caliber = 120;
-                ammo_m827.RhaPenetration = 543f;
+                ammo_m827.RhaPenetration = 520f;
                 ammo_m827.MuzzleVelocity = 1650f;
                 ammo_m827.Mass = 4.64f;
                 ammo_m827.SectionalArea = 0.0012f;
+                ammo_m827.SpallMultiplier = 1.15f;
 
                 ammo_codex_m827 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_m827.AmmoType = ammo_m827;
@@ -467,10 +454,11 @@ namespace M1A1Abrams
                 Util.ShallowCopy(ammo_m829, ammo_m833);
                 ammo_m829.Name = "M829 APFSDS-T";
                 ammo_m829.Caliber = 120;
-                ammo_m829.RhaPenetration = 570f;
+                ammo_m829.RhaPenetration = 550f;
                 ammo_m829.MuzzleVelocity = 1670f;
                 ammo_m829.Mass = 4.27f;
                 ammo_m829.SectionalArea = 0.0009f;
+                ammo_m829a1.SpallMultiplier = 1.15f;
 
                 ammo_codex_m829 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_m829.AmmoType = ammo_m829;
@@ -493,8 +481,10 @@ namespace M1A1Abrams
                 Util.ShallowCopy(ammo_m829a1, ammo_m833);
                 ammo_m829a1.Name = "M829A1 APFSDS-T";
                 ammo_m829a1.Caliber = 120;
-                ammo_m829a1.RhaPenetration = 650;
-                ammo_m829a1.SpallMultiplier = 1.2f;
+                ammo_m829a1.RhaPenetration = 600;
+                ammo_m829a1.SpallMultiplier = 1.15f;
+                ammo_m829a1.MaxSpallRha = 22f;
+                ammo_m829a1.MinSpallRha = 5f;
                 ammo_m829a1.MuzzleVelocity = 1575;
                 ammo_m829a1.Mass = 4.6f;
                 ammo_m829a1.SectionalArea = 0.00082f;

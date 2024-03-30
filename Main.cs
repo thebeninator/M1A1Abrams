@@ -14,7 +14,7 @@ using FMODUnity;
 using FMOD;
 using FMODUnityResonance;
 
-[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.1.5", "ATLAS")]
+[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.1.6", "ATLAS")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace M1A1Abrams
@@ -45,7 +45,7 @@ namespace M1A1Abrams
         }
 
         public override void OnSceneWasLoaded(int idx, string scene_name) {
-            if (scene_name == "MainMenu2_Scene" || scene_name == "LOADER_MENU" || scene_name == "LOADER_INITIAL" || scene_name == "t64_menu") return;
+            if (Util.menu_screens.Contains(scene_name)) return;
 
             gameManager = GameObject.Find("_APP_GHPC_");
             camManager = gameManager.GetComponent<CameraManager>();

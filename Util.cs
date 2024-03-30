@@ -81,6 +81,13 @@ namespace M1A1Abrams
 
     public class Util
     {
+        public static string[] menu_screens = new string[] {
+            "MainMenu2_Scene",
+            "MainMenu2-1_Scene",
+            "LOADER_MENU",
+            "LOADER_INITIAL",
+            "t64_menu"
+        };
         public class AlreadyConverted : MonoBehaviour {}
 
         // https://snipplr.com/view/75285/clone-from-one-object-to-another-using-reflection
