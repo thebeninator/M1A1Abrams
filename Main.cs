@@ -14,7 +14,7 @@ using FMODUnity;
 using FMOD;
 using FMODUnityResonance;
 
-[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.1.7", "ATLAS")]
+[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.1.7A", "ATLAS")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace M1A1Abrams
@@ -37,11 +37,6 @@ namespace M1A1Abrams
         {
             MelonPreferences_Category cfg = MelonPreferences.CreateCategory("M1A1Config");
             M1A1.Config(cfg);
-        }
-
-        public override void OnLateUpdate()
-        {
-            M1A1.LateUpdate();
         }
 
         public override void OnSceneWasLoaded(int idx, string scene_name) {

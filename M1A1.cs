@@ -97,6 +97,22 @@ namespace M1A1Abrams
         static Dictionary<string, AmmoClipCodexScriptable> ap;
         static Dictionary<string, AmmoClipCodexScriptable> heat;
 
+        public class AuxFix : MonoBehaviour {
+            GameObject heat;
+            GameObject apfsds;
+            public WeaponSystem main_gun;
+
+            void Awake() {
+                heat = transform.Find("Reticle Mesh HEAT").gameObject;
+                apfsds = transform.Find("Reticle Mesh").gameObject;
+            }
+
+            void Update() {
+                heat.SetActive(main_gun.CurrentAmmoType.Name.Contains("M830"));
+                apfsds.SetActive(main_gun.CurrentAmmoType.Name.Contains("M82"));
+            }
+        }
+
         public static void Config(MelonPreferences_Category cfg)
         {
             m829Count = cfg.CreateEntry<int>("M829", 22);
@@ -273,13 +289,16 @@ namespace M1A1Abrams
                     reticle_text_heat.text = "120-MM \n "+ heat_name + "\nMETERS";
                 }
 
-                ReticleMesh gas_ap = vic.transform.Find("IPM1_rig/HULL/TURRET/GUN/Gun Scripts/Aux sight (GAS)/Reticle Mesh").gameObject.GetComponent<ReticleMesh>();
+                Transform gas = vic.transform.Find("IPM1_rig/HULL/TURRET/GUN/Gun Scripts/Aux sight (GAS)");
+                AuxFix aux_fix = gas.gameObject.AddComponent<AuxFix>();
+                aux_fix.main_gun = mainGun;
+                ReticleMesh gas_ap = gas.Find("Reticle Mesh").gameObject.GetComponent<ReticleMesh>();
                 gas_ap.reticleSO = reticleSO_ap;
                 gas_ap.reticle = reticle_cached_ap;
                 gas_ap.SMR = null;
                 gas_ap.Load();
 
-                ReticleMesh gas_heat = vic.transform.Find("IPM1_rig/HULL/TURRET/GUN/Gun Scripts/Aux sight (GAS)/Reticle Mesh HEAT").gameObject.GetComponent<ReticleMesh>();
+                ReticleMesh gas_heat = gas.Find("Reticle Mesh HEAT").gameObject.GetComponent<ReticleMesh>();
                 gas_heat.reticleSO = reticleSO_heat;
                 gas_heat.reticle = reticle_cached_heat;
                 gas_heat.SMR = null;
@@ -325,31 +344,6 @@ namespace M1A1Abrams
             yield break;
         }
         
-        public static void LateUpdate()
-        {
-            if (M1A1AbramsMod.gameManager == null) return;
-
-            CameraSlot cam = M1A1AbramsMod.camManager._currentCamSlot;
-
-            if (cam == null) return;
-            if (cam.name != "Aux sight (GAS)") return;
-
-            if (M1A1AbramsMod.playerManager.CurrentPlayerUnit.WeaponsManager.Weapons[0].Name != "120mm gun M256") return;
-
-            AmmoType currentAmmo = M1A1AbramsMod.playerManager.CurrentPlayerUnit.WeaponsManager.Weapons[0].Weapon.FCS.CurrentAmmoType;
-
-            if (currentAmmo == null) return;    
-
-            int reticleId = currentAmmo.Name.Contains("M829") || currentAmmo.Name.Contains("M827") ? 0 : 2;
-
-            GameObject reticle = cam.transform.GetChild(reticleId).gameObject;
-
-            if (!reticle.activeSelf)
-            {
-                reticle.SetActive(true);
-            }
-        }
-
         public static void Init()
         {
             if (citv_obj == null) {
