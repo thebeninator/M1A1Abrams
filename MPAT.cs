@@ -130,9 +130,8 @@ namespace M1A1Abrams
                 for (int i = 0; i < 25; i++)
                 {
                     GHPC.Weapons.LiveRound component;
-                    component = LiveRoundMarshaller.Instance.GetRoundOfVisualType(LiveRoundMarshaller.LiveRoundVisualType.Invisible)
+                    component = LiveRoundMarshaller.Instance.GetRoundOfVisualType(LiveRoundMarshaller.LiveRoundVisualType.Spall)
                         .GetComponent<GHPC.Weapons.LiveRound>();
-
                     component.Info = M1A1.m830a1_forward_frag;
                     component.CurrentSpeed = 600f;
                     component.MaxSpeed = 600f;

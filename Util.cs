@@ -88,6 +88,7 @@ namespace M1A1Abrams
             "LOADER_INITIAL",
             "t64_menu"
         };
+
         public class AlreadyConverted : MonoBehaviour {}
 
         // https://snipplr.com/view/75285/clone-from-one-object-to-another-using-reflection

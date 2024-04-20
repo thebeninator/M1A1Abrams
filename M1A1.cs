@@ -165,7 +165,7 @@ namespace M1A1Abrams
                 WeaponsManager weaponsManager = vic.GetComponent<WeaponsManager>();
                 WeaponSystemInfo mainGunInfo = weaponsManager.Weapons[0];
                 WeaponSystem mainGun = mainGunInfo.Weapon;
-                UsableOptic optic = Util.GetDayOptic(mainGun.FCS);
+                UsableOptic optic = vic.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/GPS/Optic").GetComponent<UsableOptic>();
 
                 if (du_package.Value && vic._friendlyName == "M1A1") {
                     vic._friendlyName += "HA";
@@ -300,7 +300,7 @@ namespace M1A1Abrams
                 LateFollow tube_follower = gunTube.GetComponent<LateFollowTarget>()._lateFollowers[0];
                 tube_follower.transform.Find("Gun Breech.001").GetComponent<MeshRenderer>().enabled = false;
                 GameObject _m256_obj = GameObject.Instantiate(m256_obj, tube_follower.transform);
-                _m256_obj.transform.localPosition = new Vector3(0f, 0.05f, -1.7961f);
+                _m256_obj.transform.localPosition = new Vector3(0f, 0.0064f, -1.9416f);
 
                 // convert ammo
                 LoadoutManager loadoutManager = vic.GetComponent<LoadoutManager>();
@@ -336,7 +336,7 @@ namespace M1A1Abrams
 
             if (M1A1AbramsMod.playerManager.CurrentPlayerUnit.WeaponsManager.Weapons[0].Name != "120mm gun M256") return;
 
-            AmmoType currentAmmo = M1A1AbramsMod.playerManager.CurrentPlayerUnit.WeaponsManager.Weapons[0].Weapon.Feed.AmmoTypeInBreech;
+            AmmoType currentAmmo = M1A1AbramsMod.playerManager.CurrentPlayerUnit.WeaponsManager.Weapons[0].Weapon.FCS.CurrentAmmoType;
 
             if (currentAmmo == null) return;    
 
@@ -378,7 +378,7 @@ namespace M1A1Abrams
                 var bundle2 = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1assets/", "m256"));
                 m256_obj = bundle2.LoadAsset<GameObject>("m256.prefab");
                 m256_obj.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                m256_obj.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+                m256_obj.transform.localScale = new Vector3(0.75f, 0.75f, 0.8f);
                 m256_obj.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
                 m256_obj.AddComponent<HeatSource>();
             }
@@ -458,7 +458,7 @@ namespace M1A1Abrams
                 ammo_m829.MuzzleVelocity = 1670f;
                 ammo_m829.Mass = 4.27f;
                 ammo_m829.SectionalArea = 0.0009f;
-                ammo_m829a1.SpallMultiplier = 1.15f;
+                ammo_m829.SpallMultiplier = 1.15f;
 
                 ammo_codex_m829 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
                 ammo_codex_m829.AmmoType = ammo_m829;
@@ -517,7 +517,7 @@ namespace M1A1Abrams
                 ammo_m830.Mass = 13.5f;
                 ammo_m830.CertainRicochetAngle = 8.0f;
                 ammo_m830.ShatterOnRicochet = false;
-                ammo_m830.DetonateSpallCount = 25;
+                ammo_m830.DetonateSpallCount = 40;
                 ammo_m830.SectionalArea = 0.0095f;
 
                 ammo_codex_m830 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
