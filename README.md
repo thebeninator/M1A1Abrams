@@ -5,6 +5,9 @@ Gameplay/Install guide: https://www.youtube.com/watch?v=e_qNIyBb2SA
 
 If you get an error launching through Steam you will need to run the game executable directly.
 
+M153 CROWS model from: "MRAP Oshkosh (West)" (https://marketplace.vigilante.us/product/mrap-oshkosh-west/) by Vigilante
+CITV & M256 model pulled from: "WIP - Abrams M1A2 TUSK 2" (https://skfb.ly/VUwX) by DavidFalke
+
 ![Screenshot_12](https://github.com/thebeninator/M1A1Abrams/assets/89621837/1cac7672-1bf0-41ec-abaa-3a864b714daa)
 ![Screenshot_6](https://github.com/thebeninator/M1A1Abrams/assets/89621837/354d28e0-fa3d-49b2-89f4-368860f66dc9)
 ![Screenshot_7](https://github.com/thebeninator/M1A1Abrams/assets/89621837/1179f3f1-416f-4751-bd2b-4181dac90456)
@@ -34,5 +37,3 @@ Converts all M1IPs to M1A1s equipped with:
 		<li>Customize how many M829 and M830 rounds every M1A1/E1 carries</li>
 	</ul>
 </p>
-
-CITV & M256 model pulled from: "WIP - Abrams M1A2 TUSK 2" (https://skfb.ly/VUwX) by DavidFalke
