@@ -91,6 +91,17 @@ namespace M1A1Abrams
 
         public class AlreadyConverted : MonoBehaviour {}
 
+        public static T[] AppendToArray<T>(T[] array, T new_item) { 
+            List<T> values = new List<T>();
+            foreach (T old_item in array) {
+                values.Add(old_item);
+            }
+
+            values.Add(new_item);
+
+            return values.ToArray();
+        }
+
         // https://snipplr.com/view/75285/clone-from-one-object-to-another-using-reflection
         public static void ShallowCopy(System.Object dest, System.Object src)
         {

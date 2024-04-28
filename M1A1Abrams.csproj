@@ -97,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CITV.cs" />
+    <Compile Include="CROWS.cs" />
     <Compile Include="M1A1.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="MPAT.cs" />

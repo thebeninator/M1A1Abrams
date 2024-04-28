@@ -117,7 +117,7 @@ namespace M1A1Abrams
             if (active_crosshair_instance == null && M1A1.citv_reticle.Value) {
                 active_crosshair_instance = GameObject.Instantiate(citv_crosshair_go, canvas);
                 active_crosshair_instance.AddComponent<CITVCrosshair>();
-                active_crosshair_instance.transform.localPosition = new Vector3(0f, 0f, 572f);
+                active_crosshair_instance.transform.localPosition = new Vector3(0f, 0f, 0f);
                 active_crosshair_instance.transform.localEulerAngles = new Vector3(0f, 0f, 0f);
                 active_crosshair_instance.transform.localScale = new Vector3(6f, 3.1f, 1f);
                 active_crosshair_instance.GetComponent<UnityEngine.UI.Image>().enabled = false;
@@ -127,7 +127,7 @@ namespace M1A1Abrams
             nods.gameObject.transform.localPosition = new Vector3(-1.1638f, -0.3435f, 1.2273f);
             nods.VisionType = NightVisionType.Thermal;
             nods.IsExterior = false;
-            nods.BaseBlur = M1A1.perfect_citv.Value ? 0f : 0.05f;
+            nods.BaseBlur = M1A1.perfect_citv.Value ? 0f : 0.08f;
             nods.OtherFovs = new float[] {40f, 30f, 20f, 10f, 4f, 3.25f};
             nods.SpriteType = CameraSpriteManager.SpriteType.DefaultScope;
             PostProcessProfile nods_profile = nods.gameObject.GetComponent<SimpleNightVision>()._postVolume.profile;

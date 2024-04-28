@@ -19,6 +19,7 @@ using System.IO;
 using GHPC.Equipment;
 using GHPC;
 using Thermals;
+using static Reticle.ReticleTree.GroupBase;
 
 namespace M1A1Abrams
 {
@@ -35,13 +36,22 @@ namespace M1A1Abrams
         static MelonPreferences_Entry<bool> m1e1;
         static MelonPreferences_Entry<int> randomChanceNum;
         static MelonPreferences_Entry<bool> randomChance;
-        static MelonPreferences_Entry<bool> citv;
+        static MelonPreferences_Entry<bool> citv_m1a1;
+        static MelonPreferences_Entry<bool> citv_m1e1;
         static MelonPreferences_Entry<bool> alt_flir_colour;
         static MelonPreferences_Entry<bool> du_package;
         public static MelonPreferences_Entry<bool> perfect_citv;
         public static MelonPreferences_Entry<bool> citv_reticle;
         public static MelonPreferences_Entry<bool> citv_smooth;
         public static MelonPreferences_Entry<bool> perfect_override;
+
+        public static MelonPreferences_Entry<bool> crows_m1e1;
+        public static MelonPreferences_Entry<bool> crows_m1a1;
+        public static MelonPreferences_Entry<bool> crows_raufoss;
+        public static MelonPreferences_Entry<bool> crows_alt_placement;
+
+        public static MelonPreferences_Entry<bool> better_flir_m1e1;
+        public static MelonPreferences_Entry<bool> better_flir_m1a1;
 
         static WeaponSystemCodexScriptable gun_m256;
 
@@ -80,7 +90,7 @@ namespace M1A1Abrams
         static GameObject ammo_m830a1_vis = null;
 
         static Material du_aar_mat;
-        static ArmorCodexScriptable du_armor_codex; 
+        static ArmorCodexScriptable du_armor_codex;
 
         // gas
         static ReticleSO reticleSO_heat;
@@ -97,17 +107,20 @@ namespace M1A1Abrams
         static Dictionary<string, AmmoClipCodexScriptable> ap;
         static Dictionary<string, AmmoClipCodexScriptable> heat;
 
-        public class AuxFix : MonoBehaviour {
+        public class AuxFix : MonoBehaviour
+        {
             GameObject heat;
             GameObject apfsds;
             public WeaponSystem main_gun;
 
-            void Awake() {
+            void Awake()
+            {
                 heat = transform.Find("Reticle Mesh HEAT").gameObject;
                 apfsds = transform.Find("Reticle Mesh").gameObject;
             }
 
-            void Update() {
+            void Update()
+            {
                 heat.SetActive(main_gun.CurrentAmmoType.Name.Contains("M830"));
                 apfsds.SetActive(main_gun.CurrentAmmoType.Name.Contains("M82"));
             }
@@ -131,8 +144,10 @@ namespace M1A1Abrams
             rotateAzimuth = cfg.CreateEntry<bool>("Rotate Azimuth", false);
             rotateAzimuth.Description = "Horizontal stabilization of M1A1 sights when applying lead.";
 
-            citv = cfg.CreateEntry<bool>("CITV", false);
-            citv.Description = "Replaces commander's NVGs with variable-zoom thermals.";
+            citv_m1e1 = cfg.CreateEntry<bool>("CITV (M1E1)", false);
+            citv_m1e1.Description = "Replaces commander's NVGs with variable-zoom thermals.";
+
+            citv_m1a1 = cfg.CreateEntry<bool>("CITV (M1A1)", false);
 
             perfect_citv = cfg.CreateEntry<bool>("No Blur CITV", false);
             citv_reticle = cfg.CreateEntry<bool>("CITV Reticle", true);
@@ -148,6 +163,20 @@ namespace M1A1Abrams
 
             du_package = cfg.CreateEntry<bool>("DU Armour", false);
             du_package.Description = "Exclusively upgrades M1A1s to M1A1HAs. Increased weight.";
+
+            crows_m1e1 = cfg.CreateEntry<bool>("CROWS (M1E1)", false);
+            crows_m1e1.Description = "Remote weapons system equipped with a .50 caliber M2HB; 400 rounds, automatic lead, thermals.";
+            crows_m1a1 = cfg.CreateEntry<bool>("CROWS (M1A1)", false);
+
+            crows_alt_placement = cfg.CreateEntry<bool>("Alternative Position", false);
+            crows_alt_placement.Comment = "Moves the CROWS to the right side of the commander instead of directly in front.";
+
+            crows_raufoss = cfg.CreateEntry<bool>("Use Mk 211 Mod 0", false);
+            crows_raufoss.Comment = "Loads the CROWS M2HB with high explosive rounds.";
+
+            better_flir_m1e1 = cfg.CreateEntry<bool>("2nd Generation Thermals (M1E1)", false);
+            better_flir_m1e1.Description = "Less blurry thermals for the gunner.";
+            better_flir_m1a1 = cfg.CreateEntry<bool>("2nd Generation Thermals (M1A1)", false);
 
             m1e1 = cfg.CreateEntry<bool>("M1E1", false);
             m1e1.Description = "Convert M1s to M1E1s (i.e: they get the 120mm gun).";
@@ -171,7 +200,7 @@ namespace M1A1Abrams
 
                 int rand = (randomChance.Value) ? UnityEngine.Random.Range(1, 100) : 0;
                 if (rand > randomChanceNum.Value) continue;
-                
+
                 vic._friendlyName = (vic.FriendlyName == "M1IP") ? "M1A1" : "M1E1";
 
                 vic_go.AddComponent<MPAT_Switch>();
@@ -182,8 +211,28 @@ namespace M1A1Abrams
                 WeaponSystemInfo mainGunInfo = weaponsManager.Weapons[0];
                 WeaponSystem mainGun = mainGunInfo.Weapon;
                 UsableOptic optic = vic.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/GPS/Optic").GetComponent<UsableOptic>();
+                optic.slot.ExclusiveWeapons = new WeaponSystem[] { weaponsManager.Weapons[0].Weapon, weaponsManager.Weapons[1].Weapon };
+                optic.slot.LinkedNightSight.ExclusiveWeapons = new WeaponSystem[] { weaponsManager.Weapons[0].Weapon, weaponsManager.Weapons[1].Weapon };
 
-                if (du_package.Value && vic._friendlyName == "M1A1") {
+                vic.transform.Find("IPM1_rig/HULL/TURRET/CUPOLA/CUPOLA_GUN").localScale = Vector3.zero;
+
+                Vector3 crows_pos = crows_alt_placement.Value ? new Vector3(1.4f, 1.1164f, -0.5873f) : new Vector3(0.7855f, 1.2855f, 0.5182f);
+                if ((crows_m1e1.Value && vic._uniqueName == "M1") || (crows_m1a1.Value && vic._uniqueName == "M1IP"))
+                {
+                    CROWS.Add(vic, vic.transform.Find("IPM1_rig/HULL/TURRET"), crows_pos);
+
+                    if (!crows_alt_placement.Value)
+                        vic.DesignatedCameraSlots[0].transform.localPosition = new Vector3(-0.1538f, 0.627f, -0.05f);
+                }
+
+                if ((better_flir_m1e1.Value && vic._uniqueName == "M1") || (better_flir_m1a1.Value && vic._uniqueName == "M1IP"))
+                {
+                    optic.slot.LinkedNightSight.BaseBlur = 0.08f;
+                    vic.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/GPS/FLIR/Canvas Scanlines").gameObject.SetActive(false);
+                }
+                
+                if (du_package.Value && vic._friendlyName == "M1A1")
+                {
                     vic._friendlyName += "HA";
 
                     GameObject turret_cheeks = vic.transform.Find("IPM1_rig/HULL/TURRET").GetComponent<LateFollowTarget>()
@@ -212,9 +261,11 @@ namespace M1A1Abrams
                     optic.slot.LinkedNightSight.PairedOptic.RotateAzimuth = true;
                     optic.slot.VibrationShakeMultiplier = 0f;
                     optic.slot.VibrationPreBlur = false;
+                    optic.Alignment = OpticAlignment.BoresightStabilized;
+                    optic.slot.LinkedNightSight.PairedOptic.Alignment = OpticAlignment.BoresightStabilized;
                 }
 
-                if (citv.Value)
+                if ((citv_m1e1.Value && vic._uniqueName == "M1") || (citv_m1a1.Value && vic._uniqueName == "M1IP"))
                 {
                     GameObject c = GameObject.Instantiate(citv_obj, vic.transform.Find("IPM1_rig/HULL/TURRET"));
                     c.transform.localPosition = new Vector3(-0.6794f, 0.9341f, 0.4348f);
@@ -239,6 +290,9 @@ namespace M1A1Abrams
 
                 if (vic.FriendlyName == "M1A1HA+" && rotateAzimuth.Value)
                     vic._friendlyName = "M1A2";
+
+                if (vic.FriendlyName == "M1A2" && better_flir_m1a1.Value && crows_m1a1.Value)
+                    vic._friendlyName += " SEP";
 
                 string ap_idx = vic.UniqueName == "M1IP" ? sabot_m1ip.Value : sabot_m1.Value;
                 string heat_idx = vic.UniqueName == "M1IP" ? heat_m1ip.Value : heat_m1.Value;
@@ -286,10 +340,11 @@ namespace M1A1Abrams
                         as ReticleTree.Text;
 
                     string heat_name = heat_idx;
-                    reticle_text_heat.text = "120-MM \n "+ heat_name + "\nMETERS";
+                    reticle_text_heat.text = "120-MM \n " + heat_name + "\nMETERS";
                 }
 
                 Transform gas = vic.transform.Find("IPM1_rig/HULL/TURRET/GUN/Gun Scripts/Aux sight (GAS)");
+                gas.GetComponent<CameraSlot>().ExclusiveWeapons = optic.slot.ExclusiveWeapons;
                 AuxFix aux_fix = gas.gameObject.AddComponent<AuxFix>();
                 aux_fix.main_gun = mainGun;
                 ReticleMesh gas_ap = gas.Find("Reticle Mesh").gameObject.GetComponent<ReticleMesh>();
@@ -303,7 +358,7 @@ namespace M1A1Abrams
                 gas_heat.reticle = reticle_cached_heat;
                 gas_heat.SMR = null;
                 gas_heat.Load();
-                    
+
 
                 Transform muzzleFlashes = mainGun.MuzzleEffects[1].transform;
                 muzzleFlashes.GetChild(1).transform.localScale = new Vector3(1.3f, 1.3f, 1f);
@@ -340,13 +395,14 @@ namespace M1A1Abrams
                 mainGun.Feed.Start();
                 loadoutManager.RegisterAllBallistics();
             }
-            
+
             yield break;
         }
-        
+
         public static void Init()
         {
-            if (citv_obj == null) {
+            if (citv_obj == null)
+            {
                 var bundle = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1assets/", "citv"));
                 citv_obj = bundle.LoadAsset<GameObject>("citv.prefab");
                 citv_obj.hideFlags = HideFlags.DontUnloadUnusedAsset;
@@ -505,7 +561,7 @@ namespace M1A1Abrams
                 Util.ShallowCopy(ammo_m830, ammo_m456);
                 ammo_m830.Name = "M830 HEAT-MP-T";
                 ammo_m830.Caliber = 120;
-                ammo_m830.RhaPenetration = 480;
+                ammo_m830.RhaPenetration = 550;
                 ammo_m830.TntEquivalentKg = 1.814f;
                 ammo_m830.MuzzleVelocity = 1140f;
                 ammo_m830.Mass = 13.5f;
@@ -536,7 +592,7 @@ namespace M1A1Abrams
                 ammo_m830a1.Name = "M830A1 MPAT-T";
                 ammo_m830a1.Coeff = ammo_m829.Coeff;
                 ammo_m830a1.Caliber = 120;
-                ammo_m830a1.RhaPenetration = 450;
+                ammo_m830a1.RhaPenetration = 500;
                 ammo_m830a1.TntEquivalentKg = 1.814f;
                 ammo_m830a1.MuzzleVelocity = 1400f;
                 ammo_m830a1.Mass = 11.4f;
