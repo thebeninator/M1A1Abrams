@@ -20,6 +20,7 @@ using GHPC.Equipment;
 using GHPC;
 using Thermals;
 using static Reticle.ReticleTree.GroupBase;
+using UnityEngine.Rendering.PostProcessing;
 
 namespace M1A1Abrams
 {
@@ -214,11 +215,10 @@ namespace M1A1Abrams
                 optic.slot.ExclusiveWeapons = new WeaponSystem[] { weaponsManager.Weapons[0].Weapon, weaponsManager.Weapons[1].Weapon };
                 optic.slot.LinkedNightSight.ExclusiveWeapons = new WeaponSystem[] { weaponsManager.Weapons[0].Weapon, weaponsManager.Weapons[1].Weapon };
 
-                vic.transform.Find("IPM1_rig/HULL/TURRET/CUPOLA/CUPOLA_GUN").localScale = Vector3.zero;
-
                 Vector3 crows_pos = crows_alt_placement.Value ? new Vector3(1.4f, 1.1164f, -0.5873f) : new Vector3(0.7855f, 1.2855f, 0.5182f);
                 if ((crows_m1e1.Value && vic._uniqueName == "M1") || (crows_m1a1.Value && vic._uniqueName == "M1IP"))
                 {
+                    vic.transform.Find("IPM1_rig/HULL/TURRET/CUPOLA/CUPOLA_GUN").localScale = Vector3.zero;
                     CROWS.Add(vic, vic.transform.Find("IPM1_rig/HULL/TURRET"), crows_pos);
 
                     if (!crows_alt_placement.Value)
@@ -227,7 +227,10 @@ namespace M1A1Abrams
 
                 if ((better_flir_m1e1.Value && vic._uniqueName == "M1") || (better_flir_m1a1.Value && vic._uniqueName == "M1IP"))
                 {
+                    Grain grain; 
                     optic.slot.LinkedNightSight.BaseBlur = 0.08f;
+                    optic.slot.LinkedNightSight.PairedOptic.post.profile.TryGetSettings(out grain);
+                    grain.intensity.value = 0.01f;
                     vic.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/GPS/FLIR/Canvas Scanlines").gameObject.SetActive(false);
                 }
                 
@@ -413,6 +416,8 @@ namespace M1A1Abrams
 
                 assem.tag = "Penetrable";
                 glass.tag = "Penetrable";
+                assem.layer = 7;
+                glass.layer = 7;
 
                 assem.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
                 glass.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");

@@ -324,6 +324,8 @@ namespace M1A1Abrams
 
                 crows.transform.Find("GUN/GUN COLLIDER").tag = "Penetrable";
                 crows.transform.Find("MOUNT/MOUNT COLLIDER").tag = "Penetrable";
+                crows.transform.Find("GUN/GUN COLLIDER").gameObject.layer = 7;
+                crows.transform.Find("MOUNT/MOUNT COLLIDER").gameObject.layer = 7;
 
                 gun.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
                 mount.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
@@ -375,7 +377,7 @@ namespace M1A1Abrams
                 }
 
                 clip_50cal_400rnd = new AmmoType.AmmoClip();
-                clip_50cal_400rnd.Capacity = 2000;
+                clip_50cal_400rnd.Capacity = 400;
                 clip_50cal_400rnd.Name = "M8 API";
                 clip_50cal_400rnd.MinimalPattern = new AmmoCodexScriptable[] {
                     ammo_codex_m8,
