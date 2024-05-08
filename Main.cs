@@ -13,22 +13,23 @@ using GHPC.Player;
 using FMODUnity;
 using FMOD;
 using FMODUnityResonance;
+using GHPC.Vehicle;
 
-[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.1.8A", "ATLAS")]
+[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.1.8B", "ATLAS")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace M1A1Abrams
 {
     public class M1A1AbramsMod : MelonMod {
 
-        public static GameObject[] vic_gos;
+        public static Vehicle[] vics;
         public static GameObject gameManager;
         public static CameraManager camManager;
         public static PlayerInput playerManager;
 
         public IEnumerator GetVics(GameState _)
         {
-            vic_gos = GameObject.FindGameObjectsWithTag("Vehicle");
+            vics = GameObject.FindObjectsByType<Vehicle>(FindObjectsSortMode.None);
 
             yield break;
         }

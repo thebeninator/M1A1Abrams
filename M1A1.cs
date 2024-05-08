@@ -21,6 +21,7 @@ using GHPC;
 using Thermals;
 using static Reticle.ReticleTree.GroupBase;
 using UnityEngine.Rendering.PostProcessing;
+using GHPC.Effects;
 
 namespace M1A1Abrams
 {
@@ -188,9 +189,9 @@ namespace M1A1Abrams
         }
         public static IEnumerator Convert(GameState _)
         {
-            foreach (GameObject vic_go in M1A1AbramsMod.vic_gos)
+            foreach (Vehicle vic in M1A1AbramsMod.vics)
             {
-                Vehicle vic = vic_go.GetComponent<Vehicle>();
+                GameObject vic_go = vic.gameObject;
 
                 if (vic == null) continue;
 
@@ -362,7 +363,6 @@ namespace M1A1Abrams
                 gas_heat.SMR = null;
                 gas_heat.Load();
 
-
                 Transform muzzleFlashes = mainGun.MuzzleEffects[1].transform;
                 muzzleFlashes.GetChild(1).transform.localScale = new Vector3(1.3f, 1.3f, 1f);
                 muzzleFlashes.GetChild(2).transform.localScale = new Vector3(1.3f, 1.3f, 1f);
@@ -397,6 +397,8 @@ namespace M1A1Abrams
                 mainGun.Feed.AmmoTypeInBreech = null;
                 mainGun.Feed.Start();
                 loadoutManager.RegisterAllBallistics();
+
+                vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/Gun Scripts/turret_gun").gameObject.SetActive(false);
             }
 
             yield break;
@@ -416,8 +418,8 @@ namespace M1A1Abrams
 
                 assem.tag = "Penetrable";
                 glass.tag = "Penetrable";
-                assem.layer = 7;
-                glass.layer = 7;
+                //assem.layer = 7;
+                //glass.layer = 7;
 
                 assem.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
                 glass.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
@@ -635,8 +637,16 @@ namespace M1A1Abrams
                 m830a1_forward_frag.CertainRicochetAngle = 10f;
                 m830a1_forward_frag.SpallMultiplier = 0.2f;
                 m830a1_forward_frag.Caliber = 5f;
-                m830a1_forward_frag.ImpactTypeUnfuzed = GHPC.Effects.ParticleEffectsManager.EffectVisualType.BulletImpact;
-                m830a1_forward_frag.ImpactTypeUnfuzedTerrain = GHPC.Effects.ParticleEffectsManager.EffectVisualType.BulletImpactTerrain;
+                m830a1_forward_frag.DetonateEffect = Resources.FindObjectsOfTypeAll<GameObject>().Where(o => o.name == "Sabot Impact").First();
+                m830a1_forward_frag.ImpactEffectDescriptor = new ParticleEffectsManager.ImpactEffectDescriptor()
+                {
+                    HasImpactEffect = true,
+                    ImpactCategory = ParticleEffectsManager.Category.Kinetic,
+                    EffectSize = ParticleEffectsManager.EffectSize.Bullet,
+                    RicochetType = ParticleEffectsManager.RicochetType.None,
+                    Flags = ParticleEffectsManager.ImpactModifierFlags.Small,
+                    MinFilterStrictness = ParticleEffectsManager.FilterStrictness.Low
+                };
 
                 MPAT.AddMPATFuse(ammo_m830a1);
 
