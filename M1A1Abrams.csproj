@@ -96,8 +96,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ammo_120mm.cs" />
+    <Compile Include="Canister.cs" />
     <Compile Include="CITV.cs" />
     <Compile Include="CROWS.cs" />
+    <Compile Include="DigitalEnhancement.cs" />
+    <Compile Include="DUArmour.cs" />
+    <Compile Include="GAS.cs" />
     <Compile Include="M1A1.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="MPAT.cs" />

@@ -35,9 +35,9 @@ namespace M1A1Abrams
 
             if (player_manager.CurrentPlayerUnit.gameObject.GetInstanceID() != gameObject.GetInstanceID()) return;
 
-            M1A1.clip_m830a1.Name = activated ? "M830A1 MPAT-T [Proximity]" : "M830A1 MPAT-T";
+            Ammo_120mm.clip_m830a1.Name = activated ? "M830A1 MPAT-T [Proximity]" : "M830A1 MPAT-T";
 
-            if (Input.GetKey(KeyCode.Mouse2) && cd <= 0f && weapon.CurrentAmmoType == M1A1.ammo_m830a1)
+            if (Input.GetKey(KeyCode.Mouse2) && cd <= 0f && weapon.CurrentAmmoType == Ammo_120mm.ammo_m830a1)
             {
                 cd = 0.2f;
 
@@ -132,7 +132,7 @@ namespace M1A1Abrams
                     GHPC.Weapons.LiveRound component;
                     component = LiveRoundMarshaller.Instance.GetRoundOfVisualType(LiveRoundMarshaller.LiveRoundVisualType.Spall)
                         .GetComponent<GHPC.Weapons.LiveRound>();
-                    component.Info = M1A1.m830a1_forward_frag;
+                    component.Info = Ammo_120mm.m830a1_forward_frag;
                     component.CurrentSpeed = 600f;
                     component.MaxSpeed = 600f;
                     component.IsSpall = false;

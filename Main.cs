@@ -48,6 +48,8 @@ namespace M1A1Abrams
             playerManager = gameManager.GetComponent<PlayerInput>();
 
             StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(GetVics), GameStatePriority.Medium);
+            Ammo_120mm.Init();
+            DUArmour.Init();
             CITV.Init();
             CROWS.Init();
             M1A1.Init();

@@ -22,6 +22,8 @@ using Thermals;
 using static Reticle.ReticleTree.GroupBase;
 using UnityEngine.Rendering.PostProcessing;
 using GHPC.Effects;
+using static UnityEngine.GraphicsBuffer;
+using GHPC.AI.Sensors;
 
 namespace M1A1Abrams
 {
@@ -41,11 +43,19 @@ namespace M1A1Abrams
         static MelonPreferences_Entry<bool> citv_m1a1;
         static MelonPreferences_Entry<bool> citv_m1e1;
         static MelonPreferences_Entry<bool> alt_flir_colour;
+
         static MelonPreferences_Entry<bool> du_package;
+        static MelonPreferences_Entry<int> du_gen;
+
         public static MelonPreferences_Entry<bool> perfect_citv;
         public static MelonPreferences_Entry<bool> citv_reticle;
         public static MelonPreferences_Entry<bool> citv_smooth;
         public static MelonPreferences_Entry<bool> perfect_override;
+
+        public static MelonPreferences_Entry<bool> digital_enchancement_m1a1;
+        public static MelonPreferences_Entry<bool> digital_enchancement_m1e1;
+
+        public static MelonPreferences_Entry<bool> de_fixed_reticle_size;
 
         public static MelonPreferences_Entry<bool> crows_m1e1;
         public static MelonPreferences_Entry<bool> crows_m1a1;
@@ -56,58 +66,13 @@ namespace M1A1Abrams
         public static MelonPreferences_Entry<bool> better_flir_m1a1;
 
         static WeaponSystemCodexScriptable gun_m256;
-
-        static AmmoClipCodexScriptable clip_codex_m827;
-        static AmmoType.AmmoClip clip_m827;
-        static AmmoCodexScriptable ammo_codex_m827;
-        static AmmoType ammo_m827;
-
-        static AmmoClipCodexScriptable clip_codex_m829;
-        static AmmoType.AmmoClip clip_m829;
-        static AmmoCodexScriptable ammo_codex_m829;
-        static AmmoType ammo_m829;
-
-        static AmmoClipCodexScriptable clip_codex_m829a1;
-        static AmmoType.AmmoClip clip_m829a1;
-        static AmmoCodexScriptable ammo_codex_m829a1;
-        static AmmoType ammo_m829a1;
-
-        static AmmoClipCodexScriptable clip_codex_m830;
-        static AmmoType.AmmoClip clip_m830;
-        static AmmoCodexScriptable ammo_codex_m830;
-        static AmmoType ammo_m830;
-
-        static AmmoClipCodexScriptable clip_codex_m830a1;
-        public static AmmoType.AmmoClip clip_m830a1;
-        static AmmoCodexScriptable ammo_codex_m830a1;
-        public static AmmoType ammo_m830a1;
-        public static AmmoType m830a1_forward_frag = new AmmoType();
-
-        static AmmoType ammo_m833;
-        static AmmoType ammo_m456;
-
-        static GameObject ammo_m829_vis = null;
-        static GameObject ammo_m829a1_vis = null;
-        static GameObject ammo_m830_vis = null;
-        static GameObject ammo_m830a1_vis = null;
-
-        static Material du_aar_mat;
-        static ArmorCodexScriptable du_armor_codex;
-
-        // gas
-        static ReticleSO reticleSO_heat;
-        static ReticleMesh.CachedReticle reticle_cached_heat;
-
-        static ReticleSO reticleSO_ap;
-        static ReticleMesh.CachedReticle reticle_cached_ap;
-
-        public static AmmoType canister_ball = AmmoType.CopyOf(GHPC.Weapons.LiveRound.SpallAmmoType);
+        static WeaponSystemCodexScriptable gun_m256a1;
 
         static GameObject citv_obj;
         static GameObject m256_obj;
-
-        static Dictionary<string, AmmoClipCodexScriptable> ap;
-        static Dictionary<string, AmmoClipCodexScriptable> heat;
+        static GameObject addon_turret;
+        static GameObject addon_hull;
+        static GameObject addon_turret_l55;
 
         public class AuxFix : MonoBehaviour
         {
@@ -131,20 +96,26 @@ namespace M1A1Abrams
         public static void Config(MelonPreferences_Category cfg)
         {
             m829Count = cfg.CreateEntry<int>("M829", 22);
-            m829Count.Description = "How many rounds of M829 (APFSDS) or M830 (HEAT) each M1A1 should carry. Maximum of 40 rounds total. Bring in at least one M829 round.";
+            m829Count.Description = "How many rounds of M829 (APFSDS), M830 (HEAT) each M1A1 should carry. Maximum of 40 rounds total. Bring in at least one M829 round.";
             m830Count = cfg.CreateEntry<int>("M830", 18);
 
-            sabot_m1 = cfg.CreateEntry<string>("AP Round (M1)", "M827");
+            sabot_m1 = cfg.CreateEntry<string>("AP Round (M1E1)", "M827");
             sabot_m1.Description = "Customize which rounds M1A1s/M1E1s use";
-            sabot_m1.Comment = "M827, M829, M829A1";
-            sabot_m1ip = cfg.CreateEntry<string>("AP Round (M1IP)", "M829");
+            sabot_m1.Comment = "M827, M829, M829A1, M829A2";
+            sabot_m1ip = cfg.CreateEntry<string>("AP Round (M1A1)", "M829");
 
-            heat_m1 = cfg.CreateEntry<string>("HEAT Round (M1)", "M830");
+            heat_m1 = cfg.CreateEntry<string>("HEAT Round (M1E1)", "M830");
             heat_m1.Comment = "M830, M830A1 (has proximity fuse that can be toggled using middle mouse)";
-            heat_m1ip = cfg.CreateEntry<string>("HEAT Round (M1IP)", "M830");
+            heat_m1ip = cfg.CreateEntry<string>("HEAT Round (M1A1)", "M830");
 
             rotateAzimuth = cfg.CreateEntry<bool>("Rotate Azimuth", false);
             rotateAzimuth.Description = "Horizontal stabilization of M1A1 sights when applying lead.";
+
+            digital_enchancement_m1e1 = cfg.CreateEntry<bool>("Digital Enhancement (M1E1)", false);
+            digital_enchancement_m1e1.Description = "Additional zoom levels for thermals.";
+            digital_enchancement_m1a1 = cfg.CreateEntry<bool>("Digital Enhancement (M1A1)", false);
+            de_fixed_reticle_size = cfg.CreateEntry<bool>("Fixed Reticle Size", false);
+            de_fixed_reticle_size.Comment = "Digitally enhanced zoom levels will not increase the size of the reticle.";
 
             citv_m1e1 = cfg.CreateEntry<bool>("CITV (M1E1)", false);
             citv_m1e1.Description = "Replaces commander's NVGs with variable-zoom thermals.";
@@ -164,7 +135,9 @@ namespace M1A1Abrams
             alt_flir_colour.Description = "[Requires CITV to be enabled] Gives the gunner's sight FLIR the same colour palette as the CITV.";
 
             du_package = cfg.CreateEntry<bool>("DU Armour", false);
-            du_package.Description = "Exclusively upgrades M1A1s to M1A1HAs. Increased weight.";
+            du_package.Description = "DU inserts for the composite turret cheeks: increased KE protection. M1A1 exclusive. Increased weight.";
+            du_gen = cfg.CreateEntry<int>("DU Generation", 1);
+            du_gen.Comment = "Higher generation = more KE protection (1-3, integer)";
 
             crows_m1e1 = cfg.CreateEntry<bool>("CROWS (M1E1)", false);
             crows_m1e1.Description = "Remote weapons system equipped with a .50 caliber M2HB; 400 rounds, automatic lead, thermals.";
@@ -189,25 +162,161 @@ namespace M1A1Abrams
         }
         public static IEnumerator Convert(GameState _)
         {
+            GAS.Create(Ammo_120mm.ap[sabot_m1ip.Value].ClipType.MinimalPattern[0], Ammo_120mm.heat[heat_m1ip.Value].ClipType.MinimalPattern[0]);
+
             foreach (Vehicle vic in M1A1AbramsMod.vics)
             {
-                GameObject vic_go = vic.gameObject;
-
                 if (vic == null) continue;
+
+                GameObject vic_go = vic.gameObject;
 
                 if (vic_go.GetComponent<Util.AlreadyConverted>() != null) continue;
                 if (vic.FriendlyName != "M1IP" && !(m1e1.Value && vic.FriendlyName == "M1")) continue;
 
                 vic_go.AddComponent<Util.AlreadyConverted>();
 
+                /*
+                if (vic.FriendlyName == "M12IP") {
+                    vic._friendlyName = "M1IPv2";
+                    GameObject new_addon_cheeks = GameObject.Instantiate(addon_turret_l55);
+
+                    new_addon_cheeks.transform.parent = vic.transform.Find("IPM1_rig/M1IP_skinned");
+                    new_addon_cheeks.transform.localPosition = new Vector3(0f, 0f, 0f);
+                    new_addon_cheeks.transform.localEulerAngles = new Vector3(0f, 270f, 0f);
+
+                    new_addon_cheeks.transform.parent = vic.transform.Find("IPM1_rig/HULL/TURRET");
+                    new_addon_cheeks.transform.localEulerAngles = new Vector3(0f, 270f, 0f);
+
+                    new_addon_cheeks.transform.Find("mantlet follow").parent = vic.transform.Find("IPM1_rig/HULL/TURRET/GUN");
+
+                    LateFollow turret_follow = new_addon_cheeks.AddComponent<LateFollow>();
+                    turret_follow.FollowTarget = vic_go.transform.Find("IPM1_rig/HULL/TURRET");
+                    turret_follow.ForceToRoot = true;
+                    turret_follow.enabled = true;
+                    turret_follow.Awake();
+                    new_addon_cheeks.transform.parent = null;
+
+                    LateFollow mantlet_follow = vic.transform.Find("IPM1_rig/HULL/TURRET/GUN/mantlet follow").gameObject.AddComponent<LateFollow>();
+                    mantlet_follow.FollowTarget = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN");
+                    mantlet_follow.ForceToRoot = true;
+                    mantlet_follow.enabled = true;
+                    mantlet_follow.Awake();
+                    vic.transform.Find("IPM1_rig/HULL/TURRET/GUN/mantlet follow").parent = null;
+
+                    GameObject gun_tube = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/gun_recoil").gameObject;
+                    //LateFollow _tube_follower = gun_tube.GetComponent<LateFollowTarget>()._lateFollowers[0];
+                    //_tube_follower.transform.Find("Gun Breech.001").GetComponent<MeshRenderer>().enabled = false;
+                    new_addon_cheeks.transform.Find("rh120 visual").parent = gun_tube.transform;
+
+                    GameObject new_addon_hull = GameObject.Instantiate(addon_hull);
+                    new_addon_hull.transform.parent = vic.transform.Find("IPM1_rig/M1IP_hull");
+
+                    new_addon_hull.transform.localPosition = new Vector3(0f, 0f, 0f);
+                    new_addon_hull.transform.localEulerAngles = new Vector3(0f, 0f, 0f);
+
+                    LateFollow hull_follow = new_addon_hull.AddComponent<LateFollow>();
+                    hull_follow.FollowTarget = vic_go.transform;
+                    hull_follow.ForceToRoot = true;
+                    hull_follow.enabled = true;
+                    hull_follow.Awake();
+                    new_addon_hull.transform.parent = null;
+
+                    vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/Gun Scripts/turret_gun").gameObject.SetActive(false);
+                    vic_go.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/M1_camonet").gameObject.SetActive(false);
+
+                    GameObject new_gun_origin = new GameObject();
+                    new_gun_origin.transform.parent = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN");
+                    new_gun_origin.transform.localPosition = new Vector3(-0.0439f, -0.0281f, 3.8632f);
+                    new_gun_origin.transform.localEulerAngles = Vector3.zero;
+                    new_gun_origin.transform.localScale = Vector3.zero;
+                    SkinnedMeshRenderer m1ip_skin = vic_go.transform.Find("IPM1_rig/M1IP_skinned").GetComponent<SkinnedMeshRenderer>();
+                    Transform[] new_bones = m1ip_skin.bones;
+                    new_bones[56] = new_gun_origin.transform;
+                    m1ip_skin.bones = new_bones;
+
+                    vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/Gun Scripts/105mm Gun M68").transform.localPosition = new Vector3(0.0174f, 1.8976f, 7.0344f);
+
+                    WeaponsManager weaponsManager2 = vic.GetComponent<WeaponsManager>();
+                    WeaponSystemInfo mainGunInfo2 = weaponsManager2.Weapons[0];
+                    WeaponSystem mainGun2 = mainGunInfo2.Weapon;
+
+                    Transform muzzleFlashes2 = mainGun2.MuzzleEffects[1].transform;
+                    muzzleFlashes2.GetChild(1).transform.localScale = new Vector3(1.3f, 1.3f, 1f);
+                    muzzleFlashes2.GetChild(2).transform.localScale = new Vector3(1.3f, 1.3f, 1f);
+                    muzzleFlashes2.GetChild(4).transform.localScale = new Vector3(1.3f, 1.3f, 1f);
+
+                    mainGunInfo2.Name = "120mm gun Rh-120 L/55";
+                    mainGun2.Impulse = 68000;
+                    mainGun2.CodexEntry = gun_m256a1;
+
+                    mainGun2.WeaponSound.SingleShotEventPaths[0] = "event:/Weapons/canon_125mm-2A46";
+
+                    string ap_idx2 = sabot_m1ip.Value;
+                    AmmoClipCodexScriptable sabotClipCodex2 = ap_idx2 == "M829" ? Ammo_120mm.clip_codex_m829_l55 : Ammo_120mm.clip_codex_m829a1_l55;
+
+                    LoadoutManager loadoutManager2 = vic.GetComponent<LoadoutManager>();
+                    loadoutManager2.TotalAmmoCounts = new int[] { m829Count.Value, m830Count.Value };
+                    loadoutManager2.LoadedAmmoTypes = new AmmoClipCodexScriptable[] { sabotClipCodex2, Ammo_120mm.clip_codex_m830_l55 };
+                    loadoutManager2._totalAmmoCount = 40;
+
+                    for (int i = 0; i <= 2; i++)
+                    {
+                        GHPC.Weapons.AmmoRack rack = loadoutManager2.RackLoadouts[i].Rack;
+                        rack.ClipCapacity = i == 2 ? 4 : 18;
+                        rack.ClipTypes = new AmmoType.AmmoClip[] { sabotClipCodex2.ClipType, Ammo_120mm.clip_codex_m830_l55.ClipType };
+                        Util.EmptyRack(rack);
+                    }
+
+                    loadoutManager2.SpawnCurrentLoadout();
+                    mainGun2.Feed.AmmoTypeInBreech = null;
+                    mainGun2.Feed.Start();
+                    loadoutManager2.RegisterAllBallistics();
+
+                    UsableOptic optic2 = vic.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/GPS/Optic").GetComponent<UsableOptic>();
+
+                    DigitalEnhancement digital_enhance2 = mainGun2.FCS.gameObject.AddComponent<DigitalEnhancement>();
+                    digital_enhance2.original_blur = 0.08f;
+                    digital_enhance2.slot = optic2.slot.LinkedNightSight;
+                    digital_enhance2.reticle_plane = optic2.slot.LinkedNightSight.transform.Find("Reticle Mesh/FFP");
+                    digital_enhance2.Add(2.4f, 0.07f, 0.69f);
+                    digital_enhance2.Add(1.5f, 0.10f, 0.43f);
+
+                    Grain grain2;
+                    optic2.slot.LinkedNightSight.BaseBlur = 0.08f;
+                    optic2.slot.LinkedNightSight.PairedOptic.post.profile.TryGetSettings(out grain2);
+                    grain2.intensity.value = 0.07f;
+                    vic.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/GPS/FLIR/Canvas Scanlines").gameObject.SetActive(false);
+                    optic2.slot.LinkedNightSight.VibrationShakeMultiplier = 0.0f;
+
+                    optic2.RotateAzimuth = true;
+                    optic2.slot.LinkedNightSight.PairedOptic.RotateAzimuth = true;
+                    optic2.slot.VibrationShakeMultiplier = 0f;
+                    optic2.slot.VibrationPreBlur = false;
+                    optic2.Alignment = OpticAlignment.BoresightStabilized;
+                    optic2.slot.LinkedNightSight.PairedOptic.Alignment = OpticAlignment.BoresightStabilized;
+
+                    Transform gas2 = vic.transform.Find("IPM1_rig/HULL/TURRET/GUN/Gun Scripts/Aux sight (GAS)");
+                    gas2.GetComponent<CameraSlot>().ExclusiveWeapons = optic2.slot.ExclusiveWeapons;
+                    AuxFix aux_fix2 = gas2.gameObject.AddComponent<AuxFix>();
+                    aux_fix2.main_gun = mainGun2;
+                    ReticleMesh gas_ap2 = gas2.Find("Reticle Mesh").gameObject.GetComponent<ReticleMesh>();
+                    gas_ap2.reticleSO = GAS.reticleSO_ap;
+                    gas_ap2.reticle = GAS.reticle_cached_ap;
+                    gas_ap2.SMR = null;
+                    gas_ap2.Load();
+
+                    ReticleMesh gas_heat2 = gas2.Find("Reticle Mesh HEAT").gameObject.GetComponent<ReticleMesh>();
+                    gas_heat2.reticleSO = GAS.reticleSO_heat;
+                    gas_heat2.reticle = GAS.reticle_cached_heat;
+                    gas_heat2.SMR = null;
+                    gas_heat2.Load();
+
+                    continue;
+                }
+                */
+
                 int rand = (randomChance.Value) ? UnityEngine.Random.Range(1, 100) : 0;
                 if (rand > randomChanceNum.Value) continue;
-
-                vic._friendlyName = (vic.FriendlyName == "M1IP") ? "M1A1" : "M1E1";
-
-                vic_go.AddComponent<MPAT_Switch>();
-
-                vic_go.GetComponent<Rigidbody>().mass = du_package.Value && vic.FriendlyName == "M1A1" ? 62781.3776f : 57152.6386f;
 
                 WeaponsManager weaponsManager = vic.GetComponent<WeaponsManager>();
                 WeaponSystemInfo mainGunInfo = weaponsManager.Weapons[0];
@@ -215,6 +324,13 @@ namespace M1A1Abrams
                 UsableOptic optic = vic.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/GPS/Optic").GetComponent<UsableOptic>();
                 optic.slot.ExclusiveWeapons = new WeaponSystem[] { weaponsManager.Weapons[0].Weapon, weaponsManager.Weapons[1].Weapon };
                 optic.slot.LinkedNightSight.ExclusiveWeapons = new WeaponSystem[] { weaponsManager.Weapons[0].Weapon, weaponsManager.Weapons[1].Weapon };
+
+                vic._friendlyName = (vic.FriendlyName == "M1IP") ? "M1A1" : "M1E1";
+
+                vic_go.AddComponent<MPAT_Switch>();
+                vic_go.GetComponent<Rigidbody>().mass = du_package.Value && vic.FriendlyName == "M1A1" ? 62781.3776f : 57152.6386f;
+
+                mainGun.WeaponSound.SingleShotEventPaths[0] = "event:/Weapons/canon_125mm-2A46";
 
                 Vector3 crows_pos = crows_alt_placement.Value ? new Vector3(1.4f, 1.1164f, -0.5873f) : new Vector3(0.7855f, 1.2855f, 0.5182f);
                 if ((crows_m1e1.Value && vic._uniqueName == "M1") || (crows_m1a1.Value && vic._uniqueName == "M1IP"))
@@ -228,35 +344,37 @@ namespace M1A1Abrams
 
                 if ((better_flir_m1e1.Value && vic._uniqueName == "M1") || (better_flir_m1a1.Value && vic._uniqueName == "M1IP"))
                 {
-                    Grain grain; 
-                    optic.slot.LinkedNightSight.BaseBlur = 0.08f;
+                    Grain grain;
+                    optic.slot.LinkedNightSight.BaseBlur = 0f;
                     optic.slot.LinkedNightSight.PairedOptic.post.profile.TryGetSettings(out grain);
-                    grain.intensity.value = 0.01f;
+                    grain.intensity.value = 0.07f;
                     vic.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/GPS/FLIR/Canvas Scanlines").gameObject.SetActive(false);
+                    optic.slot.LinkedNightSight.VibrationShakeMultiplier = 0.0f;
                 }
-                
+
+                if ((digital_enchancement_m1e1.Value && vic._uniqueName == "M1") || (digital_enchancement_m1a1.Value && vic._uniqueName == "M1IP"))
+                {
+                    DigitalEnhancement digital_enhance = mainGun.FCS.gameObject.AddComponent<DigitalEnhancement>();
+                    digital_enhance.original_blur = optic.slot.LinkedNightSight.BaseBlur;
+                    digital_enhance.slot = optic.slot.LinkedNightSight;
+                    digital_enhance.reticle_plane = optic.slot.LinkedNightSight.transform.Find("Reticle Mesh/FFP");
+                    digital_enhance.Add(2.4f, 0.02f, 0.69f);
+                    digital_enhance.Add(1f, 0.10f, 0.29f);
+                }
+
                 if (du_package.Value && vic._friendlyName == "M1A1")
                 {
-                    vic._friendlyName += "HA";
+                    vic._friendlyName += du_gen.Value > 1 ? "HC" : "HA";
 
                     GameObject turret_cheeks = vic.transform.Find("IPM1_rig/HULL/TURRET").GetComponent<LateFollowTarget>()
                         ._lateFollowers[0].transform.Find("Turret_Armor/cheeks composite arrays").gameObject;
 
                     VariableArmor var_armour = turret_cheeks.GetComponent<VariableArmor>();
-                    var_armour._armorType = du_armor_codex;
-                    var_armour.AverageRha = 330f;
+                    var_armour._armorType = DUArmour.du_armor_codexes[du_gen.Value - 1];
 
                     AarVisual cheek_visual = turret_cheeks.GetComponent<AarVisual>();
 
-                    if (du_aar_mat == null)
-                    {
-                        du_aar_mat = Material.Instantiate(cheek_visual.AarMaterial);
-                        du_aar_mat.name = "du green";
-                        du_aar_mat.shaderKeywords = new string[] { "_ALPHAPREMULTIPLY_ON" };
-                        du_aar_mat.color = new Color(0.1919f, 1f, 0.1083f, 0.3922f);
-                    }
-
-                    cheek_visual.AarMaterial = du_aar_mat;
+                    cheek_visual.AarMaterial = DUArmour.du_aar_mats[du_gen.Value - 1];
                 }
 
                 if (rotateAzimuth.Value)
@@ -278,8 +396,8 @@ namespace M1A1Abrams
                     CITV citv_component = vic.DesignatedCameraSlots[0].LinkedNightSight.gameObject.AddComponent<CITV>();
                     citv_component.model = c;
 
-                    c.transform.Find("assembly").GetComponent<VariableArmor>().Unit = vic;
-                    c.transform.Find("glass").GetComponent<VariableArmor>().Unit = vic;
+                    c.transform.Find("assembly").GetComponent<UniformArmor>().Unit = vic;
+                    c.transform.Find("glass").GetComponent<UniformArmor>().Unit = vic;
 
                     if (alt_flir_colour.Value)
                         optic.slot.LinkedNightSight.PairedOptic.post.profile.settings[2] = vic.DesignatedCameraSlots[0].LinkedNightSight.gameObject.
@@ -289,10 +407,16 @@ namespace M1A1Abrams
                     //s.intensity.overrideState = true;
                     //s.intensity.value = 0.35f;
 
+                    vic._targetSpotterSettings._periscopeFOV = 120f;
+                    vic.TargetSpotterSettings._sightDistance = 4500f;
+                    vic.TargetSpotterSettings._nightSightDistanceIdeal = 4500f;
+                    vic.TargetSpotterSettings._nightSightDistancePassive = 4500f;
+                    vic.transform.Find("Unit AI").GetComponent<TankTargetSensor>()._spotTimeMax = 2f;
+
                     vic._friendlyName += "+";
                 }
 
-                if (vic.FriendlyName == "M1A1HA+" && rotateAzimuth.Value)
+                if ((vic.FriendlyName == "M1A1HA+" || vic.FriendlyName == "M1A1HC+") && rotateAzimuth.Value)
                     vic._friendlyName = "M1A2";
 
                 if (vic.FriendlyName == "M1A2" && better_flir_m1a1.Value && crows_m1a1.Value)
@@ -300,66 +424,23 @@ namespace M1A1Abrams
 
                 string ap_idx = vic.UniqueName == "M1IP" ? sabot_m1ip.Value : sabot_m1.Value;
                 string heat_idx = vic.UniqueName == "M1IP" ? heat_m1ip.Value : heat_m1.Value;
-                AmmoClipCodexScriptable sabotClipCodex = ap[ap_idx];
-                AmmoClipCodexScriptable heatClipCodex = heat[heat_idx];
-
-                if (reticleSO_ap == null)
-                {
-                    reticleSO_ap = ScriptableObject.Instantiate(ReticleMesh.cachedReticles["M1_105_GAS_APFSDS"].tree);
-                    reticleSO_ap.name = "120mm_gas_ap";
-
-                    Util.ShallowCopy(reticle_cached_ap, ReticleMesh.cachedReticles["M1_105_GAS_APFSDS"]);
-                    reticle_cached_ap.tree = reticleSO_ap;
-
-                    ReticleTree.Angular boresight = ((reticleSO_ap.planes[0]
-                        as ReticleTree.FocalPlane).elements[0]
-                        as ReticleTree.Angular);
-
-                    ReticleTree.VerticalBallistic reticle_range_ap = boresight.elements[4] as ReticleTree.VerticalBallistic;
-                    reticle_range_ap.projectile = sabotClipCodex.ClipType.MinimalPattern[0];
-                    reticle_range_ap.UpdateBC();
-
-                    ReticleTree.Text reticle_text_ap = boresight.elements[0]
-                        as ReticleTree.Text;
-
-                    string ap_name = ap_idx;
-                    reticle_text_ap.text = "120-MM\nAPFSDS-T " + ap_name + "\nMETERS";
-
-                    reticleSO_heat = ScriptableObject.Instantiate(ReticleMesh.cachedReticles["M1_105_GAS_HEAT"].tree);
-                    reticleSO_heat.name = "120mm_gas_heat";
-
-                    Util.ShallowCopy(reticle_cached_heat, ReticleMesh.cachedReticles["M1_105_GAS_HEAT"]);
-                    reticle_cached_heat.tree = reticleSO_heat;
-
-                    ReticleTree.Angular boresight_heat = ((reticleSO_heat.planes[0]
-                        as ReticleTree.FocalPlane).elements[0]
-                        as ReticleTree.Angular);
-
-                    ReticleTree.VerticalBallistic reticle_range_heat = boresight_heat.elements[4]
-                        as ReticleTree.VerticalBallistic;
-                    reticle_range_heat.projectile = heatClipCodex.ClipType.MinimalPattern[0];
-                    reticle_range_heat.UpdateBC();
-
-                    ReticleTree.Text reticle_text_heat = boresight_heat.elements[0]
-                        as ReticleTree.Text;
-
-                    string heat_name = heat_idx;
-                    reticle_text_heat.text = "120-MM \n " + heat_name + "\nMETERS";
-                }
+                AmmoClipCodexScriptable sabotClipCodex = Ammo_120mm.ap[ap_idx];
+                AmmoClipCodexScriptable heatClipCodex = Ammo_120mm.heat[heat_idx];
 
                 Transform gas = vic.transform.Find("IPM1_rig/HULL/TURRET/GUN/Gun Scripts/Aux sight (GAS)");
                 gas.GetComponent<CameraSlot>().ExclusiveWeapons = optic.slot.ExclusiveWeapons;
                 AuxFix aux_fix = gas.gameObject.AddComponent<AuxFix>();
                 aux_fix.main_gun = mainGun;
+
                 ReticleMesh gas_ap = gas.Find("Reticle Mesh").gameObject.GetComponent<ReticleMesh>();
-                gas_ap.reticleSO = reticleSO_ap;
-                gas_ap.reticle = reticle_cached_ap;
+                gas_ap.reticleSO = GAS.reticleSO_ap;
+                gas_ap.reticle = GAS.reticle_cached_ap;
                 gas_ap.SMR = null;
                 gas_ap.Load();
 
                 ReticleMesh gas_heat = gas.Find("Reticle Mesh HEAT").gameObject.GetComponent<ReticleMesh>();
-                gas_heat.reticleSO = reticleSO_heat;
-                gas_heat.reticle = reticle_cached_heat;
+                gas_heat.reticleSO = GAS.reticleSO_heat;
+                gas_heat.reticle = GAS.reticle_cached_heat;
                 gas_heat.SMR = null;
                 gas_heat.Load();
 
@@ -372,11 +453,19 @@ namespace M1A1Abrams
                 mainGun.Impulse = 68000;
                 mainGun.CodexEntry = gun_m256;
 
+                GameObject dummy_tube = new GameObject("dummy tube");
+                dummy_tube.transform.parent = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN");
+                dummy_tube.transform.localScale = new Vector3(0f, 0f, 0f);
+
+                Transform smr_path = (vic.UniqueName == "M1") ? vic.transform.Find("M1_rig/M1_skinned") : vic.transform.Find("IPM1_rig/M1IP_skinned");
+                SkinnedMeshRenderer smr = smr_path.GetComponent<SkinnedMeshRenderer>();
+                Transform[] bones = smr.bones;
+                bones[46] = dummy_tube.transform;
+                smr.bones = bones;
+
                 GameObject gunTube = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/gun_recoil").gameObject;
-                gunTube.transform.localScale = new Vector3(0f, 0f, 0f);
-                LateFollow tube_follower = gunTube.GetComponent<LateFollowTarget>()._lateFollowers[0];
-                tube_follower.transform.Find("Gun Breech.001").GetComponent<MeshRenderer>().enabled = false;
-                GameObject _m256_obj = GameObject.Instantiate(m256_obj, tube_follower.transform);
+                gunTube.transform.Find("GUN/Gun Breech.001").GetComponent<MeshRenderer>().enabled = false;
+                GameObject _m256_obj = GameObject.Instantiate(m256_obj, gunTube.transform);
                 _m256_obj.transform.localPosition = new Vector3(0f, 0.0064f, -1.9416f);
 
                 // convert ammo
@@ -426,9 +515,14 @@ namespace M1A1Abrams
                 assem.AddComponent<HeatSource>();
                 glass.AddComponent<HeatSource>();
 
-                VariableArmor assem_armour = assem.AddComponent<VariableArmor>();
-                VariableArmor glass_armour = glass.AddComponent<VariableArmor>();
-                assem_armour.AverageRha = 40f;
+                UniformArmor assem_armour = assem.AddComponent<UniformArmor>();
+                UniformArmor glass_armour = glass.AddComponent<UniformArmor>();
+                assem_armour.PrimarySabotRha = 40f;
+                assem_armour.PrimaryHeatRha = 40f;
+
+                glass_armour.PrimarySabotRha = 5f;
+                glass_armour.PrimaryHeatRha = 5f;
+
                 assem_armour._name = "CITV";
                 glass_armour._name = "CITV glass";
 
@@ -438,40 +532,102 @@ namespace M1A1Abrams
                 m256_obj.transform.localScale = new Vector3(0.75f, 0.75f, 0.8f);
                 m256_obj.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
                 m256_obj.AddComponent<HeatSource>();
-            }
 
-            if (gun_m256 == null)
-            {
-                foreach (AmmoCodexScriptable s in Resources.FindObjectsOfTypeAll(typeof(AmmoCodexScriptable)))
+                ArmorCodexScriptable spaced_so = ScriptableObject.CreateInstance<ArmorCodexScriptable>();
+                spaced_so.name = "composite screen";
+
+                ArmorType composite_screen = new ArmorType();
+                composite_screen.Name = "composite screen armour";
+                composite_screen.CanRicochet = true;
+                composite_screen.CanShatterLongRods = true;
+                composite_screen.NormalizesHits = true;
+                composite_screen.ThicknessSource = ArmorType.RhaSource.Multipliers;
+                composite_screen.SpallAngleMultiplier = 1;
+                composite_screen.SpallPowerMultiplier = 0.70f;
+                composite_screen.RhaeMultiplierCe = 1.35f;
+                composite_screen.RhaeMultiplierKe = 1.2f;
+                spaced_so.ArmorType = composite_screen;
+
+                ArmorCodexScriptable steel_so = ScriptableObject.CreateInstance<ArmorCodexScriptable>();
+                steel_so.name = "speshal steel";
+
+                ArmorType steel = new ArmorType();
+                steel.Name = "special steel";
+                steel.CanRicochet = true;
+                steel.CanShatterLongRods = true;
+                steel.NormalizesHits = true;
+                steel.ThicknessSource = ArmorType.RhaSource.Multipliers;
+                steel.SpallAngleMultiplier = 1;
+                steel.SpallPowerMultiplier = 0.70f;
+                steel.RhaeMultiplierCe = 1.05f;
+                steel.RhaeMultiplierKe = 1.05f;
+                steel_so.ArmorType = steel;
+
+                /*
+                var bundle3 = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1assets/", "m1ipv2"));
+                addon_turret = bundle3.LoadAsset<GameObject>("m1ipv2turret.prefab");
+                addon_hull = bundle3.LoadAsset<GameObject>("m1ipv2hull.prefab");
+                addon_turret_l55 = bundle3.LoadAsset<GameObject>("m1a1ipturret.prefab");
+                */
+
+                /*
+                foreach (GameObject obj in new GameObject[] { addon_turret, addon_turret_l55 })
                 {
-                    if (s.AmmoType.Name == "M833 APFSDS-T")
-                    {
-                        ammo_m833 = s.AmmoType;
-                    }
+                    obj.transform.Find("mantlet follow/mantlet").tag = "Penetrable";
+                    obj.transform.Find("mantlet follow/mantlet").gameObject.layer = 8;
+                    VariableArmor mantlet_armour = obj.transform.Find("mantlet follow/mantlet").gameObject.AddComponent<VariableArmor>();
+                    mantlet_armour._name = "addon mantlet composite wedge";
+                    mantlet_armour._armorType = spaced_so;
+                    mantlet_armour._spallForwardRatio = 0.2f;
 
-                    if (s.AmmoType.Name == "M456 HEAT-FS-T")
-                    {
-                        ammo_m456 = s.AmmoType;
-                    }
+                    obj.transform.Find("side brackets").tag = "Penetrable";
+                    obj.transform.Find("side brackets").gameObject.layer = 8;
+                    VariableArmor side_armour = obj.transform.Find("side brackets").gameObject.AddComponent<VariableArmor>();
+                    side_armour._name = "mounting bracket";
+                    side_armour._armorType = steel_so;
+                    side_armour._spallForwardRatio = 0.2f;
 
-                    if (ammo_m456 != null && ammo_m833 != null) break;
+                    obj.transform.Find("cheeks").tag = "Penetrable";
+                    obj.transform.Find("cheeks").gameObject.layer = 8;
+                    VariableArmor cheeks_armour = obj.transform.Find("cheeks").gameObject.AddComponent<VariableArmor>();
+                    cheeks_armour._name = "addon cheek composite wedge";
+                    cheeks_armour._armorType = spaced_so;
+                    cheeks_armour._spallForwardRatio = 0.2f;
+
+                    obj.transform.Find("roof").tag = "Penetrable";
+                    obj.transform.Find("roof").gameObject.layer = 8;
+                    VariableArmor roof_armour = obj.transform.Find("roof").gameObject.AddComponent<VariableArmor>();
+                    roof_armour._name = "addon roof composite plate";
+                    roof_armour._armorType = spaced_so;
+                    roof_armour._spallForwardRatio = 0.2f;
+
+                    obj.transform.Find("doghouse").tag = "Penetrable";
+                    obj.transform.Find("doghouse").gameObject.layer = 8;
+                    UniformArmor doghouse_armour = obj.transform.Find("doghouse").gameObject.AddComponent<UniformArmor>();
+                    doghouse_armour._name = "addon GPS doghouse armour";
+                    doghouse_armour._armorType = steel_so;
+                    doghouse_armour.PrimaryHeatRha = 30f;
+                    doghouse_armour.PrimarySabotRha = 30f;
                 }
 
-                du_armor_codex = ScriptableObject.CreateInstance<ArmorCodexScriptable>();
-                du_armor_codex.name = "Abrams DU composite";
+                addon_hull.transform.Find("addon hull/upper").tag = "Penetrable";
+                addon_hull.transform.Find("addon hull/upper").gameObject.layer = 8;
+                VariableArmor upper_armour = addon_hull.transform.Find("addon hull/upper").gameObject.AddComponent<VariableArmor>();
+                upper_armour._name = "addon upper glacis composite plate";
+                upper_armour._armorType = spaced_so;
+                upper_armour._spallForwardRatio = 0.2f;
 
-                ArmorType du = new ArmorType();
-                du.Name = "special armor";
-                du.CanRicochet = true;
-                du.CanShatterLongRods = true;
-                du.NormalizesHits = true;
-                du.ThicknessSource = ArmorType.RhaSource.Multipliers;
-                du.SpallAngleMultiplier = 1;
-                du.SpallPowerMultiplier = 0.80f;
-                du.RhaeMultiplierCe = 1.4f;
-                du.RhaeMultiplierKe = 0.75f;
-                du_armor_codex.ArmorType = du;
-
+                addon_hull.transform.Find("addon hull/lower").tag = "Penetrable";
+                addon_hull.transform.Find("addon hull/lower").gameObject.layer = 8;
+                VariableArmor lower_armour = addon_hull.transform.Find("addon hull/lower").gameObject.AddComponent<VariableArmor>();
+                lower_armour._name = "addon lower glacis plate";
+                lower_armour._armorType = steel_so;
+                lower_armour._spallForwardRatio = 0.2f;
+                */
+            }
+            
+            if (gun_m256 == null)
+            {
                 // m256
                 gun_m256 = ScriptableObject.CreateInstance<WeaponSystemCodexScriptable>();
                 gun_m256.name = "gun_m256";
@@ -479,213 +635,11 @@ namespace M1A1Abrams
                 gun_m256.FriendlyName = "120mm Gun M256";
                 gun_m256.Type = WeaponSystemCodexScriptable.WeaponType.LargeCannon;
 
-                // xm827
-                ammo_m827 = new AmmoType();
-                Util.ShallowCopy(ammo_m827, ammo_m833);
-                ammo_m827.Name = "M827 APFSDS-T";
-                ammo_m827.Caliber = 120;
-                ammo_m827.RhaPenetration = 520f;
-                ammo_m827.MuzzleVelocity = 1650f;
-                ammo_m827.Mass = 4.64f;
-                ammo_m827.SectionalArea = 0.0012f;
-                ammo_m827.SpallMultiplier = 1.15f;
-
-                ammo_codex_m827 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
-                ammo_codex_m827.AmmoType = ammo_m827;
-                ammo_codex_m827.name = "ammo_m827";
-
-                clip_m827 = new AmmoType.AmmoClip();
-                clip_m827.Capacity = 1;
-                clip_m827.Name = "M827 APFSDS-T";
-                clip_m827.MinimalPattern = new AmmoCodexScriptable[1];
-                clip_m827.MinimalPattern[0] = ammo_codex_m827;
-
-                clip_codex_m827 = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
-                clip_codex_m827.name = "clip_m827";
-                clip_codex_m827.CompatibleWeaponSystems = new WeaponSystemCodexScriptable[1];
-                clip_codex_m827.CompatibleWeaponSystems[0] = gun_m256;
-                clip_codex_m827.ClipType = clip_m827;
-
-                // m829 
-                ammo_m829 = new AmmoType();
-                Util.ShallowCopy(ammo_m829, ammo_m833);
-                ammo_m829.Name = "M829 APFSDS-T";
-                ammo_m829.Caliber = 120;
-                ammo_m829.RhaPenetration = 550f;
-                ammo_m829.MuzzleVelocity = 1670f;
-                ammo_m829.Mass = 4.27f;
-                ammo_m829.SectionalArea = 0.0009f;
-                ammo_m829.SpallMultiplier = 1.15f;
-
-                ammo_codex_m829 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
-                ammo_codex_m829.AmmoType = ammo_m829;
-                ammo_codex_m829.name = "ammo_m829";
-
-                clip_m829 = new AmmoType.AmmoClip();
-                clip_m829.Capacity = 1;
-                clip_m829.Name = "M829 APFSDS-T";
-                clip_m829.MinimalPattern = new AmmoCodexScriptable[1];
-                clip_m829.MinimalPattern[0] = ammo_codex_m829;
-
-                clip_codex_m829 = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
-                clip_codex_m829.name = "clip_m829";
-                clip_codex_m829.CompatibleWeaponSystems = new WeaponSystemCodexScriptable[1];
-                clip_codex_m829.CompatibleWeaponSystems[0] = gun_m256;
-                clip_codex_m829.ClipType = clip_m829;
-
-                // m829a1
-                ammo_m829a1 = new AmmoType();
-                Util.ShallowCopy(ammo_m829a1, ammo_m833);
-                ammo_m829a1.Name = "M829A1 APFSDS-T";
-                ammo_m829a1.Caliber = 120;
-                ammo_m829a1.RhaPenetration = 600;
-                ammo_m829a1.SpallMultiplier = 1.15f;
-                ammo_m829a1.MaxSpallRha = 22f;
-                ammo_m829a1.MinSpallRha = 5f;
-                ammo_m829a1.MuzzleVelocity = 1575;
-                ammo_m829a1.Mass = 4.6f;
-                ammo_m829a1.SectionalArea = 0.00082f;
-                ammo_m829a1.Coeff /= 1.5f;
-
-                ammo_codex_m829a1 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
-                ammo_codex_m829a1.AmmoType = ammo_m829a1;
-                ammo_codex_m829a1.name = "ammo_m829a1";
-
-                clip_m829a1 = new AmmoType.AmmoClip();
-                clip_m829a1.Capacity = 1;
-                clip_m829a1.Name = "M829A1 APFSDS-T";
-                clip_m829a1.MinimalPattern = new AmmoCodexScriptable[1];
-                clip_m829a1.MinimalPattern[0] = ammo_codex_m829a1;
-
-                clip_codex_m829a1 = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
-                clip_codex_m829a1.name = "clip_m829a1";
-                clip_codex_m829a1.CompatibleWeaponSystems = new WeaponSystemCodexScriptable[1];
-                clip_codex_m829a1.CompatibleWeaponSystems[0] = gun_m256;
-                clip_codex_m829a1.ClipType = clip_m829a1;
-
-                // m830
-                ammo_m830 = new AmmoType();
-                Util.ShallowCopy(ammo_m830, ammo_m456);
-                ammo_m830.Name = "M830 HEAT-MP-T";
-                ammo_m830.Caliber = 120;
-                ammo_m830.RhaPenetration = 550;
-                ammo_m830.TntEquivalentKg = 1.814f;
-                ammo_m830.MuzzleVelocity = 1140f;
-                ammo_m830.Mass = 13.5f;
-                ammo_m830.CertainRicochetAngle = 8.0f;
-                ammo_m830.ShatterOnRicochet = false;
-                ammo_m830.DetonateSpallCount = 40;
-                ammo_m830.SectionalArea = 0.0095f;
-
-                ammo_codex_m830 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
-                ammo_codex_m830.AmmoType = ammo_m830;
-                ammo_codex_m830.name = "ammo_m830";
-
-                clip_m830 = new AmmoType.AmmoClip();
-                clip_m830.Capacity = 1;
-                clip_m830.Name = "M830 HEAT-MP-T";
-                clip_m830.MinimalPattern = new AmmoCodexScriptable[1];
-                clip_m830.MinimalPattern[0] = ammo_codex_m830;
-
-                clip_codex_m830 = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
-                clip_codex_m830.name = "clip_m830";
-                clip_codex_m830.CompatibleWeaponSystems = new WeaponSystemCodexScriptable[1];
-                clip_codex_m830.CompatibleWeaponSystems[0] = gun_m256;
-                clip_codex_m830.ClipType = clip_m830;
-
-                // m830a1
-                ammo_m830a1 = new AmmoType();
-                Util.ShallowCopy(ammo_m830a1, ammo_m456);
-                ammo_m830a1.Name = "M830A1 MPAT-T";
-                ammo_m830a1.Coeff = ammo_m829.Coeff;
-                ammo_m830a1.Caliber = 120;
-                ammo_m830a1.RhaPenetration = 500;
-                ammo_m830a1.TntEquivalentKg = 1.814f;
-                ammo_m830a1.MuzzleVelocity = 1400f;
-                ammo_m830a1.Mass = 11.4f;
-                ammo_m830a1.CertainRicochetAngle = 5.0f;
-                ammo_m830a1.ShatterOnRicochet = false;
-                ammo_m830a1.AlwaysProduceBlast = true;
-                ammo_m830a1.DetonateSpallCount = 60;
-                ammo_m830a1.MaxSpallRha = 35f;
-                ammo_m830a1.SectionalArea = 0.0055f;
-
-                ammo_codex_m830a1 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
-                ammo_codex_m830a1.AmmoType = ammo_m830a1;
-                ammo_codex_m830a1.name = "ammo_m830a1";
-
-                clip_m830a1 = new AmmoType.AmmoClip();
-                clip_m830a1.Capacity = 1;
-                clip_m830a1.Name = "M830A1 MPAT-T";
-                clip_m830a1.MinimalPattern = new AmmoCodexScriptable[1];
-                clip_m830a1.MinimalPattern[0] = ammo_codex_m830a1;
-
-                clip_codex_m830a1 = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
-                clip_codex_m830a1.name = "clip_m830a1";
-                clip_codex_m830a1.CompatibleWeaponSystems = new WeaponSystemCodexScriptable[1];
-                clip_codex_m830a1.CompatibleWeaponSystems[0] = gun_m256;
-                clip_codex_m830a1.ClipType = clip_m830a1;
-
-                m830a1_forward_frag.Name = "mpat forward frag";
-                m830a1_forward_frag.RhaPenetration = 250f;
-                m830a1_forward_frag.MuzzleVelocity = 600f;
-                m830a1_forward_frag.Category = AmmoType.AmmoCategory.Penetrator;
-                m830a1_forward_frag.Mass = 0.80f;
-                m830a1_forward_frag.SectionalArea = 0.0055f;
-                m830a1_forward_frag.Coeff = 0.5f;
-                m830a1_forward_frag.UseTracer = false;
-                m830a1_forward_frag.CertainRicochetAngle = 10f;
-                m830a1_forward_frag.SpallMultiplier = 0.2f;
-                m830a1_forward_frag.Caliber = 5f;
-                m830a1_forward_frag.DetonateEffect = Resources.FindObjectsOfTypeAll<GameObject>().Where(o => o.name == "Sabot Impact").First();
-                m830a1_forward_frag.ImpactEffectDescriptor = new ParticleEffectsManager.ImpactEffectDescriptor()
-                {
-                    HasImpactEffect = true,
-                    ImpactCategory = ParticleEffectsManager.Category.Kinetic,
-                    EffectSize = ParticleEffectsManager.EffectSize.Bullet,
-                    RicochetType = ParticleEffectsManager.RicochetType.None,
-                    Flags = ParticleEffectsManager.ImpactModifierFlags.Small,
-                    MinFilterStrictness = ParticleEffectsManager.FilterStrictness.Low
-                };
-
-                MPAT.AddMPATFuse(ammo_m830a1);
-
-                ammo_m829_vis = GameObject.Instantiate(ammo_m833.VisualModel);
-                ammo_m829_vis.name = "M829 visual";
-                ammo_m829.VisualModel = ammo_m829_vis;
-                ammo_m829.VisualModel.GetComponent<AmmoStoredVisual>().AmmoType = ammo_m829;
-                ammo_m829.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m829;
-
-                ammo_m829a1_vis = GameObject.Instantiate(ammo_m833.VisualModel);
-                ammo_m829a1_vis.name = "M829A1 visual";
-                ammo_m829a1.VisualModel = ammo_m829a1_vis;
-                ammo_m829a1.VisualModel.GetComponent<AmmoStoredVisual>().AmmoType = ammo_m829a1;
-                ammo_m829a1.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m829a1;
-
-                ammo_m830_vis = GameObject.Instantiate(ammo_m456.VisualModel);
-                ammo_m830_vis.name = "M830 visual";
-                ammo_m830.VisualModel = ammo_m830_vis;
-                ammo_m830.VisualModel.GetComponent<AmmoStoredVisual>().AmmoType = ammo_m830;
-                ammo_m830.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m830;
-
-                ammo_m830a1_vis = GameObject.Instantiate(ammo_m456.VisualModel);
-                ammo_m830a1_vis.name = "M830A1 visual";
-                ammo_m830a1.VisualModel = ammo_m830a1_vis;
-                ammo_m830a1.VisualModel.GetComponent<AmmoStoredVisual>().AmmoType = ammo_m830a1;
-                ammo_m830a1.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m830a1;
-
-                ap = new Dictionary<string, AmmoClipCodexScriptable>()
-                {
-                    ["M827"] = clip_codex_m827,
-                    ["M829"] = clip_codex_m829,
-                    ["M829A1"] = clip_codex_m829a1,
-                };
-
-                heat = new Dictionary<string, AmmoClipCodexScriptable>()
-                {
-                    ["M830"] = clip_codex_m830,
-                    ["M830A1"] = clip_codex_m830a1,
-                };
+                gun_m256a1 = ScriptableObject.CreateInstance<WeaponSystemCodexScriptable>();
+                gun_m256a1.name = "gun_m256a1";
+                gun_m256a1.CaliberMm = 120;
+                gun_m256a1.FriendlyName = "120mm Gun Rh-120 L/55";
+                gun_m256a1.Type = WeaponSystemCodexScriptable.WeaponType.LargeCannon;
             }
 
             StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(Convert), GameStatePriority.Medium);

@@ -19,6 +19,7 @@ using UnityEngine.UI;
 using Thermals;
 using static UnityEngine.GraphicsBuffer;
 using UnityEngine.Rendering.PostProcessing;
+using GHPC.Effects;
 
 namespace M1A1Abrams
 {
@@ -114,7 +115,6 @@ namespace M1A1Abrams
             aimable_mount._stabActive = true;
             aimable_mount._stabMode = StabilizationMode.Vector;
             aimable_mount.ProtectFromBadProjection = true;
-            aimable_mount.AarPoseLocalMode = true;
             aimable_mount.SpeedPowered = 40f;
             aimable_mount.enabled = true;
 
@@ -126,7 +126,6 @@ namespace M1A1Abrams
             aimable_gun._equipmentManager = vic._equipmentManager;
             aimable_gun._stabActive = true;
             aimable_gun._stabMode = StabilizationMode.Vector;
-            aimable_gun.AarPoseLocalMode = true;
             aimable_gun.enabled = true;
             aimable_gun.ProtectFromBadProjection = true;
             aimable_gun.ReverseLocalEuler = true;
@@ -218,7 +217,7 @@ namespace M1A1Abrams
             flir_optic.slot.VisionType = NightVisionType.Thermal;
             flir_optic.slot.IsLinkedNightSight = true;
             flir_optic.slot.LinkedDaySight = fcs.MainOptic.slot;
-            flir_optic.slot.BaseBlur = 0.03f;
+            flir_optic.slot.BaseBlur = 0f;
 
             fcs.MainOptic.slot.LinkedNightSight = flir_optic.slot;
             fcs.NightOptic = flir_optic;
@@ -402,6 +401,16 @@ namespace M1A1Abrams
             ammo_raufoss.MuzzleVelocity = 979f;
             ammo_raufoss.ImpactAudio = GHPC.Audio.ImpactAudioType.AutocannonExplosive;
             ammo_raufoss.Category = AmmoType.AmmoCategory.Explosive;
+            ammo_raufoss.ImpactEffectDescriptor = new ParticleEffectsManager.ImpactEffectDescriptor()
+            {
+                HasImpactEffect = true,
+                ImpactCategory = ParticleEffectsManager.Category.Kinetic,
+                EffectSize = ParticleEffectsManager.EffectSize.Bullet,
+                RicochetType = ParticleEffectsManager.RicochetType.None,
+                Flags =  ParticleEffectsManager.ImpactModifierFlags.Incendiary | ParticleEffectsManager.ImpactModifierFlags.VeryLarge,
+                MinFilterStrictness = ParticleEffectsManager.FilterStrictness.Low
+            };
+            ammo_raufoss.CachedIndex = -1;
 
             ammo_codex_raufoss = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
             ammo_codex_raufoss.AmmoType = ammo_raufoss;
@@ -409,8 +418,10 @@ namespace M1A1Abrams
 
             ammo_raufoss_tracer = new AmmoType();
             Util.ShallowCopy(ammo_raufoss_tracer, ammo_raufoss);
-            ammo_raufoss.Name = "Mk 30 Mod 0 HEIAP-T";
-            ammo_raufoss.UseTracer = true;
+            ammo_raufoss_tracer.Name = "Mk 30 Mod 0 HEIAP-T";
+            ammo_raufoss_tracer.UseTracer = true;
+            ammo_raufoss_tracer.ImpactEffectDescriptor.RicochetType = ParticleEffectsManager.RicochetType.LargeTracer;
+            ammo_raufoss_tracer.CachedIndex = -1;
 
             ammo_codex_raufoss_tracer = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
             ammo_codex_raufoss_tracer.AmmoType = ammo_raufoss_tracer;
@@ -431,7 +442,6 @@ namespace M1A1Abrams
             clip_codex_raufoss_400rnd.name = "clip_raufoss_400rnd";
             clip_codex_raufoss_400rnd.ClipType = clip_raufoss_400rnd;
         
-
             Reticle();
         }
     }
