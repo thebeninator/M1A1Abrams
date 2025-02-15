@@ -74,6 +74,15 @@ namespace M1A1Abrams
         static GameObject addon_hull;
         static GameObject addon_turret_l55;
 
+        public class parallax_debug : MonoBehaviour {
+            public FireControlSystem fcs;
+
+            void Update() { 
+                
+            
+            }
+        }
+
         public class AuxFix : MonoBehaviour
         {
             GameObject heat;
@@ -162,8 +171,6 @@ namespace M1A1Abrams
         }
         public static IEnumerator Convert(GameState _)
         {
-            GAS.Create(Ammo_120mm.ap[sabot_m1ip.Value].ClipType.MinimalPattern[0], Ammo_120mm.heat[heat_m1ip.Value].ClipType.MinimalPattern[0]);
-
             foreach (Vehicle vic in M1A1AbramsMod.vics)
             {
                 if (vic == null) continue;
@@ -174,6 +181,8 @@ namespace M1A1Abrams
                 if (vic.FriendlyName != "M1IP" && !(m1e1.Value && vic.FriendlyName == "M1")) continue;
 
                 vic_go.AddComponent<Util.AlreadyConverted>();
+
+                GAS.Create(Ammo_120mm.ap[sabot_m1ip.Value].ClipType.MinimalPattern[0], Ammo_120mm.heat[heat_m1ip.Value].ClipType.MinimalPattern[0]);
 
                 /*
                 if (vic.FriendlyName == "M12IP") {
@@ -458,9 +467,10 @@ namespace M1A1Abrams
                 dummy_tube.transform.localScale = new Vector3(0f, 0f, 0f);
 
                 Transform smr_path = (vic.UniqueName == "M1") ? vic.transform.Find("M1_rig/M1_skinned") : vic.transform.Find("IPM1_rig/M1IP_skinned");
+                int gun_recoil_idx = (vic.UniqueName == "M1") ? 46 : 56;
                 SkinnedMeshRenderer smr = smr_path.GetComponent<SkinnedMeshRenderer>();
                 Transform[] bones = smr.bones;
-                bones[46] = dummy_tube.transform;
+                bones[gun_recoil_idx] = dummy_tube.transform;
                 smr.bones = bones;
 
                 GameObject gunTube = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/gun_recoil").gameObject;

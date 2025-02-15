@@ -15,7 +15,7 @@ using FMOD;
 using FMODUnityResonance;
 using GHPC.Vehicle;
 
-[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.1.8B", "ATLAS")]
+[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.2.0", "ATLAS")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace M1A1Abrams

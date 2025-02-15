@@ -246,7 +246,6 @@ namespace M1A1Abrams
                 ammo_m830a1 = new AmmoType();
                 Util.ShallowCopy(ammo_m830a1, ammo_m456);
                 ammo_m830a1.Name = "M830A1 MPAT-T";
-                ammo_m830a1.Category = AmmoType.AmmoCategory.Explosive;
                 ammo_m830a1.Coeff = ammo_m829.Coeff;
                 ammo_m830a1.Caliber = 120;
                 ammo_m830a1.RhaPenetration = 500;

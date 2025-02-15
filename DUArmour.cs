@@ -66,7 +66,7 @@ namespace M1A1Abrams
             gen2.ThicknessSource = ArmorType.RhaSource.Multipliers;
             gen2.SpallAngleMultiplier = 1;
             gen2.SpallPowerMultiplier = 0.80f;
-            gen2.RhaeMultiplierCe = 1.45f;
+            gen2.RhaeMultiplierCe = 1.50f;
             gen2.RhaeMultiplierKe = 0.85f;
             gen2_du_armor_codex.ArmorType = gen2;
 
@@ -78,7 +78,7 @@ namespace M1A1Abrams
             gen3.ThicknessSource = ArmorType.RhaSource.Multipliers;
             gen3.SpallAngleMultiplier = 1;
             gen3.SpallPowerMultiplier = 0.80f;
-            gen3.RhaeMultiplierCe = 1.45f;
+            gen3.RhaeMultiplierCe = 1.70f;
             gen3.RhaeMultiplierKe = 0.92f;
             gen3_du_armor_codex.ArmorType = gen3;
 
