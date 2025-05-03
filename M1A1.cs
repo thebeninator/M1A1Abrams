@@ -74,15 +74,6 @@ namespace M1A1Abrams
         static GameObject addon_hull;
         static GameObject addon_turret_l55;
 
-        public class parallax_debug : MonoBehaviour {
-            public FireControlSystem fcs;
-
-            void Update() { 
-                
-            
-            }
-        }
-
         public class AuxFix : MonoBehaviour
         {
             GameObject heat;
@@ -402,6 +393,9 @@ namespace M1A1Abrams
                     c.transform.localPosition = new Vector3(-0.6794f, 0.9341f, 0.4348f);
                     c.transform.localEulerAngles = new Vector3(0f, 0f, 0f);
 
+                    c.transform.SetParent(vic.transform.Find("IPM1_rig/HULL/TURRET").GetComponent<LateFollowTarget>()
+                        ._lateFollowers[0].transform, true);
+
                     CITV citv_component = vic.DesignatedCameraSlots[0].LinkedNightSight.gameObject.AddComponent<CITV>();
                     citv_component.model = c;
 
@@ -517,8 +511,8 @@ namespace M1A1Abrams
 
                 assem.tag = "Penetrable";
                 glass.tag = "Penetrable";
-                //assem.layer = 7;
-                //glass.layer = 7;
+                assem.layer = 8;
+                glass.layer = 8;
 
                 assem.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
                 glass.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");

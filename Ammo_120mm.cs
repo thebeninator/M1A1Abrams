@@ -432,15 +432,16 @@ namespace M1A1Abrams
                 ammo_m830_l55.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m830_l55;
 
                 // canister
-                /*
+                
                 ammo_m1028 = new AmmoType();
                 Util.ShallowCopy(ammo_m1028, ammo_m827);
+                ammo_m1028.CachedIndex = -1;
                 ammo_m1028.Name = "M1028 APERS";
                 ammo_m1028.Category = AmmoType.AmmoCategory.Penetrator;
                 ammo_m1028.Caliber = 120;
                 ammo_m1028.RhaPenetration = 0;
                 ammo_m1028.TntEquivalentKg = 0f;
-                ammo_m1028.MuzzleVelocity = 1640f;
+                ammo_m1028.MuzzleVelocity = 800f;
                 ammo_m1028.Mass = 0.80f;
                 ammo_m1028.DetonateSpallCount = 0;
                 ammo_m1028.AlwaysProduceBlast = false;
@@ -452,10 +453,10 @@ namespace M1A1Abrams
                 ammo_m1028.RangedFuseTime = 0.005f;
                 ammo_m1028.DetonateEffect = null;
                 ammo_m1028.TerrainImpactEffect = null;
-                ammo_m1028.ImpactEffectDescriptor.HasImpactEffect = false;
-                ammo_m1028.ImpactEffectDescriptor.ImpactCategory = ParticleEffectsManager.Category.Kinetic;
-                ammo_m1028.ImpactEffectDescriptor.EffectSize = ParticleEffectsManager.EffectSize.Bullet;
-                ammo_m1028.ImpactEffectDescriptor.Flags = ParticleEffectsManager.ImpactModifierFlags.Small;
+                ammo_m1028.ImpactEffectDescriptor = new ParticleEffectsManager.ImpactEffectDescriptor()
+                {
+                    HasImpactEffect = false
+                };
                 ammo_m1028.ImpactAudio = GHPC.Audio.ImpactAudioType.Generic;
 
                 ammo_codex_m1028 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
@@ -482,20 +483,25 @@ namespace M1A1Abrams
                 canister_ball = new AmmoType();
                 Util.ShallowCopy(canister_ball, Resources.FindObjectsOfTypeAll<AmmoCodexScriptable>().Where(o => o.name == "ammo_762NATO").First().AmmoType);
                 canister_ball.Name = "Canister Ball";
+                canister_ball.CachedIndex = -1;
                 canister_ball.RhaPenetration = 120f;
-                canister_ball.MuzzleVelocity = 1640f;
+                canister_ball.MuzzleVelocity = 800f;
                 // 800 gram pellet doesn't really make sense but any lower and it will drop like a rock
                 canister_ball.Mass = 0.80f;
                 canister_ball.SectionalArea = 0.0008f;
-                canister_ball.EdgeSetback = 0.001f;
                 canister_ball.Coeff = 0.22f;
                 canister_ball.UseTracer = false;
                 canister_ball.CertainRicochetAngle = 10f;
                 canister_ball.SpallMultiplier = 0f;
                 canister_ball.Caliber = 1f;
                 canister_ball.NoPenSpall = true;
-                canister_ball.UseErrorCorrection = false;
-                */
+                canister_ball.ImpactEffectDescriptor = new ParticleEffectsManager.ImpactEffectDescriptor()
+                {
+                    HasImpactEffect = false,
+                };
+
+                canister_ball.VisualType = LiveRoundMarshaller.LiveRoundVisualType.Invisible;
+                
                 ap = new Dictionary<string, AmmoClipCodexScriptable>()
                 {
                     ["M827"] = clip_codex_m827,

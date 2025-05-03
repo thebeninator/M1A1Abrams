@@ -70,6 +70,7 @@ namespace M1A1Abrams
             _crows.transform.localPosition = position;
 
             GameObject mount = _crows.transform.Find("MOUNT").gameObject;
+            mount.transform.localEulerAngles = Vector3.zero;
             GameObject gun = _crows.transform.Find("GUN").gameObject;
 
             GameObject gun_vis = gun.transform.Find("GUN VIS").gameObject;
@@ -273,23 +274,23 @@ namespace M1A1Abrams
             line1.rotation.mrad = 0;
             line1.position.x = 0;
             line1.position.y = 0;
-            line1.length.mrad = 15.0944f;
+            line1.length.mrad = 13.0944f;
             line1.thickness.mrad /= 1.7f;
             line1.illumination = ReticleTree.Light.Type.Powered;
             line1.visualType = ReticleTree.VisualElement.Type.Painted;
 
             ReticleTree.Line line2 = reticle_hq.elements[1] as ReticleTree.Line;
             line2.position.y = 0;
-            line2.length.mrad = 15.0944f;
+            line2.length.mrad = 13.0944f;
             line2.thickness.mrad /= 1.7f;
             line2.illumination = ReticleTree.Light.Type.Powered;
             line2.visualType = ReticleTree.VisualElement.Type.Painted;
 
             List<Vector3> box_pos = new List<Vector3>() {
-                new Vector3(0, -10.344f),
-                new Vector3(0, 10.344f),
-                new Vector3(10.344f, 0),
-                new Vector3(-10.344f,0),
+                new Vector3(0, -7.344f),
+                new Vector3(0, 7.344f),
+                new Vector3(7.344f, 0),
+                new Vector3(-7.344f,0),
             };
 
             foreach (Vector3 pos in box_pos)
@@ -297,7 +298,7 @@ namespace M1A1Abrams
                 ReticleTree.Line box = new ReticleTree.Line();
                 box.roundness = 0f;
                 box.thickness.mrad = line2.thickness.mrad * 2.8f;
-                box.length.mrad = 10f;
+                box.length.mrad = 6f;
                 box.thickness.unit = AngularLength.AngularUnit.MIL_USSR;
                 box.length.unit = AngularLength.AngularUnit.MIL_USSR;
                 box.rotation.mrad = pos.x == 0 ? line2.rotation.mrad : line1.rotation.mrad;
