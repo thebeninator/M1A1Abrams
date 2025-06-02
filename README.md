@@ -23,7 +23,7 @@ Converts all M1IPs to M1A1s equipped with:
 </p>
 
 # Extra Features/Settings (in mod config)
-- Alternate APFSDS rounds: M827, M829A1
+- Alternate APFSDS rounds: M827, M829A1, M829A2
 - Alternate HEAT rounds: M830A1 (has a proximity fuse that can be toggled using middle mouse)
 - Customize how many M829 and M830 rounds every M1A1/E1 carries
 - The following are disabled by default:
