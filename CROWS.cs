@@ -11,6 +11,8 @@ using Reticle;
 using UnityEngine.UI;
 using GHPC.Thermals;
 using GHPC.Effects;
+using GHPC.Player;
+using GHPC.Camera;
 
 namespace M1A1Abrams
 {
@@ -43,7 +45,7 @@ namespace M1A1Abrams
             public FireControlSystem fcs;
 
             void Update() { 
-                fcs.SetStabsActive(fcs.GetInstanceID() == M1A1AbramsMod.playerManager.CurrentPlayerWeapon.FCS.GetInstanceID());
+                fcs.SetStabsActive(fcs.GetInstanceID() == PlayerInput.Instance.CurrentPlayerWeapon.FCS.GetInstanceID());
             }
         }
 
@@ -224,8 +226,8 @@ namespace M1A1Abrams
             vic.AimablePlatforms = Util.AppendToArray(vic.AimablePlatforms, aimable_mount);
             vic.AimablePlatforms = Util.AppendToArray(vic.AimablePlatforms, aimable_gun);
 
-            if (vic.GetInstanceID() == M1A1AbramsMod.playerManager.CurrentPlayerUnit.GetComponent<Vehicle>().GetInstanceID())
-                M1A1AbramsMod.camManager.RescanCamSlots(vic.DesignatedCameraSlots);
+            if (vic.GetInstanceID() == PlayerInput.Instance.CurrentPlayerUnit.GetComponent<Vehicle>().GetInstanceID())
+                CameraManager.Instance.RescanCamSlots(vic.DesignatedCameraSlots);
 
             StaticWhenNotInUse fix = fcs.gameObject.AddComponent<StaticWhenNotInUse>();
             fix.fcs = fcs;

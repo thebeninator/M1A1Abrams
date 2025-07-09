@@ -17,8 +17,6 @@ namespace M1A1Abrams
 
         public static Vehicle[] vics;
         public static GameObject gameManager;
-        public static CameraManager camManager;
-        public static PlayerInput playerManager;
 
         public IEnumerator GetVics(GameState _)
         {
@@ -44,9 +42,6 @@ namespace M1A1Abrams
             gameManager = GameObject.Find("_APP_GHPC_");
 
             if (gameManager == null) return;
-
-            camManager = gameManager.GetComponent<CameraManager>();
-            playerManager = gameManager.GetComponent<PlayerInput>();
 
             StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(GetVics), GameStatePriority.Medium);
 

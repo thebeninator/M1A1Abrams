@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using GHPC.Camera;
+using GHPC.Player;
 
 namespace M1A1Abrams
 {
@@ -17,7 +18,7 @@ namespace M1A1Abrams
         }
 
         void Update() {
-            if (M1A1AbramsMod.playerManager.CurrentPlayerWeapon.FCS.GetInstanceID() != slot.PairedOptic.FCS.GetInstanceID()) return;
+            if (PlayerInput.Instance.CurrentPlayerWeapon.FCS.GetInstanceID() != slot.PairedOptic.FCS.GetInstanceID()) return;
 
             if (!zoom_levels.ContainsKey(slot.CurrentFov)) {
                 reticle_plane.localScale = Vector3.one;

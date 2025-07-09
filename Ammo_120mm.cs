@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using GHPC.Effects;
 using GHPC.Weapons;
 using MelonLoader;
@@ -201,18 +202,26 @@ namespace M1A1Abrams
             ammo_m829a3.SectionalArea = 0.00086f;
             ammo_m829a3.Coeff = 0.22f;
             ammo_m829a3.CachedIndex = -1;
-   
-            ammo_m829a3.ArmorOptimizations = new AmmoType.ArmorOptimization[] {
-                new AmmoType.ArmorOptimization() {
-                    Armor = PactIncreasedLethality.Kontakt5.kontakt5_so,
-                    RhaRatio = 0.25f
-                },
-                new AmmoType.ArmorOptimization() {
-                    Armor = PactIncreasedLethality.Relikt.rlkt_so,
-                    RhaRatio = 0.25f
-                }
-            };
-                     
+
+            string k5 = Assembly.CreateQualifiedName("PactIncreasedLethality", "PactIncreasedLethality.Kontakt5");
+            string relikt = Assembly.CreateQualifiedName("PactIncreasedLethality", "PactIncreasedLethality.Relikt");
+            Type k5_type = Type.GetType(k5);
+            Type relikt_type = Type.GetType(relikt);
+            if (k5_type != null)
+            {
+                ammo_m829a3.ArmorOptimizations = new AmmoType.ArmorOptimization[] {
+                    new AmmoType.ArmorOptimization() {
+                        Armor = (ArmorCodexScriptable)k5_type.GetField("kontakt5_so", BindingFlags.Static | BindingFlags.Public).GetValue(null),
+                        RhaRatio = 0.25f
+                    },
+                    
+                    new AmmoType.ArmorOptimization() {
+                        Armor = (ArmorCodexScriptable)relikt_type.GetField("rlkt_so", BindingFlags.Static | BindingFlags.Public).GetValue(null),
+                        RhaRatio = 0.25f
+                    }                   
+                };
+            }
+                    
             ammo_codex_m829a3 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
             ammo_codex_m829a3.AmmoType = ammo_m829a3;
             ammo_codex_m829a3.name = "ammo_m829a3";

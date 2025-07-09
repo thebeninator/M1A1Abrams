@@ -193,6 +193,7 @@ namespace M1A1Abrams
                     digital_enhance.Add(2.4f, 0.01f, 0.69f);
                     digital_enhance.Add(1f, 0.02f, 0.29f);
                 }
+
                 bool has_du_package = is_m1ip ? du_package_m1ip.Value : du_package_m1.Value;
                 int du_gen = is_m1ip ? du_gen_m1ip.Value : du_gen_m1.Value;
                 vic_go.GetComponent<Rigidbody>().mass = has_du_package && vic.FriendlyName == "M1A1" ? 62781.3776f : 57152.6386f;
@@ -252,6 +253,7 @@ namespace M1A1Abrams
                     vic._friendlyName += " SEP";
                 }
 
+
                 mainGunInfo.Name = "120mm gun M256";
                 mainGun.Impulse = 68000;
                 mainGun.CodexEntry = gun_m256;
@@ -268,11 +270,13 @@ namespace M1A1Abrams
                 bones[gun_recoil_idx] = dummy_tube.transform;
                 smr.bones = bones;
 
+                
                 GameObject gunTube = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/gun_recoil").gameObject;
                 gunTube.transform.Find("GUN/Gun Breech.001").GetComponent<MeshRenderer>().enabled = false;
+          
                 GameObject _m256_obj = GameObject.Instantiate(m256_obj, gunTube.transform);
                 _m256_obj.transform.localPosition = new Vector3(0f, 0.0064f, -1.9416f);
-
+                
                 Transform muzzleFlashes = mainGun.MuzzleEffects[1].transform;
                 muzzleFlashes.GetChild(1).transform.localScale = new Vector3(1.3f, 1.3f, 1f);
                 muzzleFlashes.GetChild(2).transform.localScale = new Vector3(1.3f, 1.3f, 1f);
@@ -357,12 +361,6 @@ namespace M1A1Abrams
                 gun_m256.CaliberMm = 120;
                 gun_m256.FriendlyName = "120mm Gun M256";
                 gun_m256.Type = WeaponSystemCodexScriptable.WeaponType.LargeCannon;
-
-                gun_m256a1 = ScriptableObject.CreateInstance<WeaponSystemCodexScriptable>();
-                gun_m256a1.name = "gun_m256a1";
-                gun_m256a1.CaliberMm = 120;
-                gun_m256a1.FriendlyName = "120mm Gun Rh-120 L/55";
-                gun_m256a1.Type = WeaponSystemCodexScriptable.WeaponType.LargeCannon;
             }
 
             StateController.RunOrDefer(GameState.GameReady, new GameStateEventHandler(Convert), GameStatePriority.Medium);
