@@ -201,26 +201,18 @@ namespace M1A1Abrams
             ammo_m829a3.SectionalArea = 0.00086f;
             ammo_m829a3.Coeff = 0.22f;
             ammo_m829a3.CachedIndex = -1;
-
-            Type k5_type = Type.GetType("PactIncreasedLethality.Kontakt5");
-            if (k5_type == null)
-            {
-                MelonLogger.Msg("PIL dll was not loaded; will not create armour optimizations for K5/Relikt");
-            }
-            else
-            {
-                ammo_m829a3.ArmorOptimizations = new AmmoType.ArmorOptimization[] {
-                    new AmmoType.ArmorOptimization() {
-                        Armor = PactIncreasedLethality.Kontakt5.kontakt5_so,
-                        RhaRatio = 0.25f
-                    },
-                    new AmmoType.ArmorOptimization() {
-                        Armor = PactIncreasedLethality.Relikt.rlkt_so,
-                        RhaRatio = 0.25f
-                    }
-                };
-            }
-            
+   
+            ammo_m829a3.ArmorOptimizations = new AmmoType.ArmorOptimization[] {
+                new AmmoType.ArmorOptimization() {
+                    Armor = PactIncreasedLethality.Kontakt5.kontakt5_so,
+                    RhaRatio = 0.25f
+                },
+                new AmmoType.ArmorOptimization() {
+                    Armor = PactIncreasedLethality.Relikt.rlkt_so,
+                    RhaRatio = 0.25f
+                }
+            };
+                     
             ammo_codex_m829a3 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
             ammo_codex_m829a3.AmmoType = ammo_m829a3;
             ammo_codex_m829a3.name = "ammo_m829a3";
