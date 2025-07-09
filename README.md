@@ -23,7 +23,7 @@ Converts all M1IPs to M1A1s equipped with:
 </p>
 
 # Extra Features/Settings (in mod config)
-- Alternate APFSDS rounds: M827, M829A1
+- Alternate APFSDS rounds: M827, M829A1, M829A2
 - Alternate HEAT rounds: M830A1 (has a proximity fuse that can be toggled using middle mouse)
 - Customize how many M829 and M830 rounds every M1A1/E1 carries
 - The following are disabled by default:
@@ -33,4 +33,12 @@ Converts all M1IPs to M1A1s equipped with:
 	- Commander CITV
 	- Depleted uranium cheek armour for M1A1s
 	- M153 CROWS
-	- 2nd generation gunner's thermals
+	- Different gunner's thermal settings
+   
+# Conversions
+
+<p>M1A1: All settings disabled</p>
+<p>M1A1HA: DU Armour (gen = 1)</p>
+<p>M1A1HC: DU Armour (gen > 1)</p>
+<p>M1A2: Rotate Azimuth, CITV, DU Armour (gen >= 1) </p>
+<p>M1A2 SEP: M1A2, FLIR generation = 3 or CROWS</p>
