@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using GHPC.Equipment;
+﻿using GHPC.Equipment;
 using UnityEngine;
 using System.IO;
 using MelonLoader.Utils;
@@ -66,7 +61,7 @@ namespace M1A1Abrams
             gen2.ThicknessSource = ArmorType.RhaSource.Multipliers;
             gen2.SpallAngleMultiplier = 1;
             gen2.SpallPowerMultiplier = 0.80f;
-            gen2.RhaeMultiplierCe = 1.50f;
+            gen2.RhaeMultiplierCe = 1.55f;
             gen2.RhaeMultiplierKe = 0.85f;
             gen2_du_armor_codex.ArmorType = gen2;
 
@@ -78,8 +73,8 @@ namespace M1A1Abrams
             gen3.ThicknessSource = ArmorType.RhaSource.Multipliers;
             gen3.SpallAngleMultiplier = 1;
             gen3.SpallPowerMultiplier = 0.80f;
-            gen3.RhaeMultiplierCe = 1.70f;
-            gen3.RhaeMultiplierKe = 0.92f;
+            gen3.RhaeMultiplierCe = 1.75f;
+            gen3.RhaeMultiplierKe = 0.96f;
             gen3_du_armor_codex.ArmorType = gen3;
 
             du_aar_mats = new Material[] { gen1_du_aar_mat, gen2_du_aar_mat, gen3_du_aar_mat };

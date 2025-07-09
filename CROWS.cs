@@ -1,24 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GHPC;
 using GHPC.Utility;
 using GHPC.Vehicle;
 using MelonLoader.Utils;
 using UnityEngine;
 using GHPC.Weapons;
-using HarmonyLib;
 using GHPC.Equipment.Optics;
-using MelonLoader;
 using Reticle;
-using static UnityEngine.Rendering.PostProcessing.SubpixelMorphologicalAntialiasing;
 using UnityEngine.UI;
-using Thermals;
-using static UnityEngine.GraphicsBuffer;
-using UnityEngine.Rendering.PostProcessing;
+using GHPC.Thermals;
 using GHPC.Effects;
 
 namespace M1A1Abrams
@@ -26,12 +17,6 @@ namespace M1A1Abrams
     public class CROWS
     {
         static GameObject crows;
-        static GameObject m2_browning;
-        static GameObject gun_sight;
-        static GameObject fcs_go;
-
-        static AmmoCodexScriptable ammo_codex_m8;
-        static AmmoCodexScriptable ammo_codex_50tracer;
 
         static AmmoClipCodexScriptable clip_codex_50cal_400rnd;
         static AmmoType.AmmoClip clip_50cal_400rnd;
@@ -43,7 +28,6 @@ namespace M1A1Abrams
         static AmmoClipCodexScriptable clip_codex_raufoss_400rnd;
         static AmmoType.AmmoClip clip_raufoss_400rnd;
 
-        static GameObject box_canvas;
         static ReticleSO reticleSO_hq;
         static ReticleMesh.CachedReticle reticle_cached_hq;
 
@@ -133,12 +117,12 @@ namespace M1A1Abrams
             aimable_gun.LocalEulerLimits = new Vector2(-15f, 60f);
             gun.transform.localEulerAngles = Vector3.zero;
 
-            GameObject _fcs_go = GameObject.Instantiate(fcs_go, mount.transform);
-            GameObject _m2_browning = GameObject.Instantiate(m2_browning, gun.transform);
+            GameObject _fcs_go = GameObject.Instantiate(Assets.m2_fcs, mount.transform);
+            GameObject _m2_browning = GameObject.Instantiate(Assets.m2_browning, gun.transform);
             _m2_browning.transform.SetParent(gun.transform);
             _m2_browning.transform.localPosition = new Vector3(0f, 0f, 1.201f);
 
-            GameObject _gun_sight = GameObject.Instantiate(gun_sight, gun.transform);
+            GameObject _gun_sight = GameObject.Instantiate(Assets.m2_gun_sight, gun.transform);
             _gun_sight.transform.SetParent(gun.transform);
             _gun_sight.transform.localPosition = new Vector3(0f, -0.085f, 0.85f);
 
@@ -201,7 +185,7 @@ namespace M1A1Abrams
 
             for (int i = 0; i <= 3; i++)
             {
-                GameObject t = GameObject.Instantiate(box_canvas, fcs.MainOptic.transform);
+                GameObject t = GameObject.Instantiate(Assets.box_canvas, fcs.MainOptic.transform);
                 t.transform.GetChild(0).localPosition = borders[i][0];
                 t.transform.GetChild(0).localEulerAngles = borders[i][1];
                 if (i == 2 || i == 3)
@@ -219,6 +203,10 @@ namespace M1A1Abrams
             flir_optic.slot.IsLinkedNightSight = true;
             flir_optic.slot.LinkedDaySight = fcs.MainOptic.slot;
             flir_optic.slot.BaseBlur = 0f;
+            flir_optic.slot.CanToggleFlirPolarity = true;
+            flir_optic.slot.OverrideFLIRResolution = true;
+            flir_optic.slot.FLIRWidth = 1024;
+            flir_optic.slot.FLIRHeight = 600;
 
             fcs.MainOptic.slot.LinkedNightSight = flir_optic.slot;
             fcs.NightOptic = flir_optic;
@@ -239,10 +227,8 @@ namespace M1A1Abrams
             if (vic.GetInstanceID() == M1A1AbramsMod.playerManager.CurrentPlayerUnit.GetComponent<Vehicle>().GetInstanceID())
                 M1A1AbramsMod.camManager.RescanCamSlots(vic.DesignatedCameraSlots);
 
-
             StaticWhenNotInUse fix = fcs.gameObject.AddComponent<StaticWhenNotInUse>();
             fix.fcs = fcs;
-
         }
 
         public static void Reticle() {
@@ -312,88 +298,42 @@ namespace M1A1Abrams
         }
 
         public static void Init() {
-            if (crows == null)
-            {
-                var bundle = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1assets/", "crows"));
-                crows = bundle.LoadAsset<GameObject>("CROWS.prefab");
-                crows.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                crows.transform.localScale = new Vector3(0.75f, 0.75f, 0.75f);
+            if (crows != null) return;
 
-                GameObject gun = crows.transform.Find("GUN/GUN VIS").gameObject;
-                GameObject mount = crows.transform.Find("MOUNT/MOUNT VIS").gameObject;
+            var bundle = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1assets/", "crows"));
+            crows = bundle.LoadAsset<GameObject>("CROWS.prefab");
+            crows.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            crows.transform.localScale = new Vector3(0.75f, 0.75f, 0.75f);
 
-                crows.transform.Find("GUN/GUN COLLIDER").tag = "Penetrable";
-                crows.transform.Find("MOUNT/MOUNT COLLIDER").tag = "Penetrable";
-                crows.transform.Find("GUN/GUN COLLIDER").gameObject.layer = 7;
-                crows.transform.Find("MOUNT/MOUNT COLLIDER").gameObject.layer = 7;
+            GameObject gun = crows.transform.Find("GUN/GUN VIS").gameObject;
+            GameObject mount = crows.transform.Find("MOUNT/MOUNT VIS").gameObject;
 
-                gun.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
-                mount.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
-                gun.AddComponent<HeatSource>();
-                mount.AddComponent<HeatSource>();
-            }
+            crows.transform.Find("GUN/GUN COLLIDER").tag = "Penetrable";
+            crows.transform.Find("MOUNT/MOUNT COLLIDER").tag = "Penetrable";
+            crows.transform.Find("GUN/GUN COLLIDER").gameObject.layer = 7;
+            crows.transform.Find("MOUNT/MOUNT COLLIDER").gameObject.layer = 7;
 
-            foreach (Vehicle obj in Resources.FindObjectsOfTypeAll(typeof(Vehicle)))
-            {
-                if (!ReticleMesh.cachedReticles.ContainsKey("T55-NVS") && obj.name == "T55A")
-                {
-                    UsableOptic night_optic = obj.transform.Find("Gun Scripts/Sights (and FCS)/NVS").GetComponent<UsableOptic>();
-                    night_optic.reticleMesh.Load();
-                }
+            gun.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
+            mount.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
+            crows.AddComponent<HeatSource>().heat = 5f;
 
-                if (obj.name == "M60A3")
-                {
-                    m2_browning = obj.transform.Find("Cupola Scripts/12.7mm Machine Gun M85").gameObject;
-                    gun_sight = obj.transform.Find("Cupola Scripts/M85 gunsight").gameObject;
-                    fcs_go = obj.transform.Find("Cupola Scripts/M85 FCS").gameObject;
-                }
+            clip_50cal_400rnd = new AmmoType.AmmoClip();
+            clip_50cal_400rnd.Capacity = 400;
+            clip_50cal_400rnd.Name = "M8 API";
+            clip_50cal_400rnd.MinimalPattern = new AmmoCodexScriptable[] {
+                Assets.ammo_codex_m8,
+                Assets.ammo_codex_m8,
+                Assets.ammo_codex_m8,
+                Assets.ammo_codex_m8,
+                Assets.ammo_codex_50tracer,
+            };
 
-                if (obj.name == "M2 Bradley")
-                {
-                    box_canvas = GameObject.Instantiate(obj.transform.Find("FCS and sights/GPS Optic/M2 Bradley GPS canvas").gameObject);
-                    GameObject.Destroy(box_canvas.transform.GetChild(2).gameObject);
-                    box_canvas.SetActive(false);
-                    box_canvas.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                    box_canvas.name = "boxy";
-                }
-
-                if (box_canvas != null && m2_browning != null && ReticleMesh.cachedReticles.ContainsKey("T55-NVS")) break;
-            }
-
-            if (clip_50cal_400rnd == null) {
-                foreach (AmmoCodexScriptable s in Resources.FindObjectsOfTypeAll(typeof(AmmoCodexScriptable)))
-                {
-                    if (s.name == "ammo_M8")
-                    {
-                        ammo_codex_m8 = s;
-                    }
-
-                    if (s.name == "ammo_50_tracer")
-                    {
-                        ammo_codex_50tracer = s;
-                    }
-
-                    if (ammo_codex_m8 != null && ammo_codex_50tracer != null) break;
-                }
-
-                clip_50cal_400rnd = new AmmoType.AmmoClip();
-                clip_50cal_400rnd.Capacity = 400;
-                clip_50cal_400rnd.Name = "M8 API";
-                clip_50cal_400rnd.MinimalPattern = new AmmoCodexScriptable[] {
-                    ammo_codex_m8,
-                    ammo_codex_m8,
-                    ammo_codex_m8,
-                    ammo_codex_m8,
-                    ammo_codex_50tracer,
-                };
-
-                clip_codex_50cal_400rnd = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
-                clip_codex_50cal_400rnd.name = "clip_50cal_400rnd";
-                clip_codex_50cal_400rnd.ClipType = clip_50cal_400rnd;
-            }
-
+            clip_codex_50cal_400rnd = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
+            clip_codex_50cal_400rnd.name = "clip_50cal_400rnd";
+            clip_codex_50cal_400rnd.ClipType = clip_50cal_400rnd;
+           
             ammo_raufoss = new AmmoType();
-            Util.ShallowCopy(ammo_raufoss, ammo_codex_m8.AmmoType);
+            Util.ShallowCopy(ammo_raufoss, Assets.ammo_codex_m8.AmmoType);
             ammo_raufoss.Name = "Mk 211 Mod 0 HEIAP";
             ammo_raufoss.UseTracer = false;
             ammo_raufoss.TntEquivalentKg = 0.035f;

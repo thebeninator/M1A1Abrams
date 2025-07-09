@@ -1,17 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BehaviorDesigner.Runtime.Tasks;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using GHPC.Weapons;
 using HarmonyLib;
-using MelonLoader;
-using M1A1Abrams;
-using static MelonLoader.MelonLogger;
-using GHPC.Camera;
-using GHPC.Equipment.Optics;
 using GHPC.Player;
 
 namespace M1A1Abrams
@@ -72,8 +62,7 @@ namespace M1A1Abrams
         void Detonate()
         {
             if (detonated) return;
-            live_round._rangedFuseActive = true;
-            live_round._rangedFuseCountdown = 0f;
+            live_round.Detonate();
             detonated = true;
         }
 

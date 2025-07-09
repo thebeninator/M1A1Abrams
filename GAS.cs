@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GHPC.Camera;
+using GHPC.Weapons;
 using Reticle;
 using UnityEngine;
 
@@ -16,49 +13,65 @@ namespace M1A1Abrams
         public static ReticleSO reticleSO_ap;
         public static ReticleMesh.CachedReticle reticle_cached_ap;
 
+        public static void Add(Transform gas, WeaponSystem[] exclusives) {
+            CameraSlot slot = gas.GetComponent<CameraSlot>();
+            slot.ExclusiveWeapons = exclusives;
+           
+            ReticleMesh gas_ap = gas.Find("Reticle Mesh").gameObject.GetComponent<ReticleMesh>();
+            gas_ap.reticleSO = GAS.reticleSO_ap;
+            gas_ap.reticle = GAS.reticle_cached_ap;
+            gas_ap.SMR = null;
+            gas_ap.Load();
+
+            ReticleMesh gas_heat = gas.Find("Reticle Mesh HEAT").gameObject.GetComponent<ReticleMesh>();
+            gas_heat.reticleSO = GAS.reticleSO_heat;
+            gas_heat.reticle = GAS.reticle_cached_heat;
+            gas_heat.SMR = null;
+            gas_heat.Load();
+        }
+
         public static void Create(AmmoCodexScriptable sabot, AmmoCodexScriptable heat) {
-            if (reticleSO_ap == null)
-            {
-                reticleSO_ap = ScriptableObject.Instantiate(ReticleMesh.cachedReticles["M1_105_GAS_APFSDS"].tree);
-                reticleSO_ap.name = "120mm_gas_ap";
+            if (reticleSO_ap != null) return;
 
-                Util.ShallowCopy(reticle_cached_ap, ReticleMesh.cachedReticles["M1_105_GAS_APFSDS"]);
-                reticle_cached_ap.tree = reticleSO_ap;
+            reticleSO_ap = ScriptableObject.Instantiate(ReticleMesh.cachedReticles["M1_105_GAS_APFSDS"].tree);
+            reticleSO_ap.name = "120mm_gas_ap";
 
-                ReticleTree.Angular boresight = ((reticleSO_ap.planes[0]
-                    as ReticleTree.FocalPlane).elements[0]
-                    as ReticleTree.Angular);
+            Util.ShallowCopy(reticle_cached_ap, ReticleMesh.cachedReticles["M1_105_GAS_APFSDS"]);
+            reticle_cached_ap.tree = reticleSO_ap;
 
-                ReticleTree.VerticalBallistic reticle_range_ap = boresight.elements[4] as ReticleTree.VerticalBallistic;
-                reticle_range_ap.projectile = sabot;
-                reticle_range_ap.UpdateBC();
+            ReticleTree.Angular boresight = ((reticleSO_ap.planes[0]
+                as ReticleTree.FocalPlane).elements[0]
+                as ReticleTree.Angular);
 
-                ReticleTree.Text reticle_text_ap = boresight.elements[0]
-                    as ReticleTree.Text;
+            ReticleTree.VerticalBallistic reticle_range_ap = boresight.elements[4] as ReticleTree.VerticalBallistic;
+            reticle_range_ap.projectile = sabot;
+            reticle_range_ap.UpdateBC();
 
-                reticle_text_ap.text = "APFSDS-T\nMETERS";
+            ReticleTree.Text reticle_text_ap = boresight.elements[0]
+                as ReticleTree.Text;
 
-                reticleSO_heat = ScriptableObject.Instantiate(ReticleMesh.cachedReticles["M1_105_GAS_HEAT"].tree);
-                reticleSO_heat.name = "120mm_gas_heat";
+            reticle_text_ap.text = "APFSDS-T\nMETERS";
 
-                Util.ShallowCopy(reticle_cached_heat, ReticleMesh.cachedReticles["M1_105_GAS_HEAT"]);
-                reticle_cached_heat.tree = reticleSO_heat;
+            reticleSO_heat = ScriptableObject.Instantiate(ReticleMesh.cachedReticles["M1_105_GAS_HEAT"].tree);
+            reticleSO_heat.name = "120mm_gas_heat";
 
-                ReticleTree.Angular boresight_heat = ((reticleSO_heat.planes[0]
-                    as ReticleTree.FocalPlane).elements[0]
-                    as ReticleTree.Angular);
+            Util.ShallowCopy(reticle_cached_heat, ReticleMesh.cachedReticles["M1_105_GAS_HEAT"]);
+            reticle_cached_heat.tree = reticleSO_heat;
 
-                ReticleTree.VerticalBallistic reticle_range_heat = boresight_heat.elements[4]
-                    as ReticleTree.VerticalBallistic;
-                reticle_range_heat.projectile = heat;
-                reticle_range_heat.UpdateBC();
+            ReticleTree.Angular boresight_heat = ((reticleSO_heat.planes[0]
+                as ReticleTree.FocalPlane).elements[0]
+                as ReticleTree.Angular);
 
-                ReticleTree.Text reticle_text_heat = boresight_heat.elements[0]
-                    as ReticleTree.Text;
+            ReticleTree.VerticalBallistic reticle_range_heat = boresight_heat.elements[4]
+                as ReticleTree.VerticalBallistic;
+            reticle_range_heat.projectile = heat;
+            reticle_range_heat.UpdateBC();
 
-                string heat_name = heat.AmmoType.Name;
-                reticle_text_heat.text = heat_name + "\nMETERS";
-            }
+            ReticleTree.Text reticle_text_heat = boresight_heat.elements[0]
+                as ReticleTree.Text;
+
+            string heat_name = heat.AmmoType.Name;
+            reticle_text_heat.text = heat_name + "\nMETERS";
         }
     }
 }
