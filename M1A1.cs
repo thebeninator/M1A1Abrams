@@ -11,6 +11,8 @@ using GHPC;
 using GHPC.Thermals;
 using GHPC.AI.Sensors;
 using MelonLoader.Utils;
+using GHPC.Camera;
+using GHPC.Player;
 
 namespace M1A1Abrams
 {
@@ -232,6 +234,12 @@ namespace M1A1Abrams
 
                     CITV citv_component = vic.DesignatedCameraSlots[0].LinkedNightSight.gameObject.AddComponent<CITV>();
                     citv_component.model = c;
+
+                    if (vic.GetInstanceID() == PlayerInput.Instance.CurrentPlayerUnit.GetComponent<Vehicle>().GetInstanceID())
+                    {
+                        CameraManager.Instance.UpdateLightMode(mode: NightVisionType.Thermal);
+                        CameraSlot.ActiveInstance.ThisActiveChanged(true);
+                    }
 
                     c.transform.Find("assembly").GetComponent<UniformArmor>().Unit = vic;
                     c.transform.Find("glass").GetComponent<UniformArmor>().Unit = vic;

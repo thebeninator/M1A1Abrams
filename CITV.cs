@@ -120,11 +120,12 @@ namespace M1A1Abrams
             nods.SpriteType = CameraSpriteManager.SpriteType.DefaultScope;
             nods.FLIRBlitMaterialOverride = Assets.flir_blit_mat_green_no_scan;
             SimpleNightVision nods_snv = nods.GetComponent<SimpleNightVision>();
+            Component.Destroy(nods.GetComponent<PostProcessVolume>());
             GameObject post = GameObject.Instantiate(Assets.flir_post, nods.transform);
             post.transform.Find("MainCam Volume").gameObject.SetActive(false);
 
             PostProcessVolume post_vol = post.transform.Find("FLIR Only Volume").GetComponent<PostProcessVolume>();
-            post_vol.enabled = false;
+            post_vol.enabled = true;
             nods_snv._postVolume = post_vol.GetComponent<PostProcessVolume>();
         }
 
