@@ -115,9 +115,9 @@ namespace M1A1Abrams
             du_gen_m1 = cfg.CreateEntry<int>("DU Generation (M1E1)", 1);
             du_package_m1.Comment = "Doesn't apply to M1E1, only those converted to M1A1";
 
-            crows_m1e1 = cfg.CreateEntry<bool>("CROWS (M1E1)", false);
+            crows_m1e1 = cfg.CreateEntry<bool>("CROWS (M1E1) <DISABLED>", false);
             crows_m1e1.Description = "Remote weapons system equipped with a .50 caliber M2HB; 400 rounds, automatic lead, thermals.";
-            crows_m1a1 = cfg.CreateEntry<bool>("CROWS (M1A1)", false);
+            crows_m1a1 = cfg.CreateEntry<bool>("CROWS (M1A1) <DISABLED>", false);
 
             crows_alt_placement = cfg.CreateEntry<bool>("Alternative Position", false);
             crows_alt_placement.Comment = "Moves the CROWS to the right side of the commander instead of directly in front.";
@@ -144,7 +144,7 @@ namespace M1A1Abrams
                 GameObject vic_go = vic.gameObject;
 
                 if (vic_go.GetComponent<Util.AlreadyConverted>() != null) continue;
-                if (vic.FriendlyName != "M1IP" && !(m1e1.Value && vic.FriendlyName == "M1")) continue;
+                if (vic.FriendlyName != "M1IP" && !(m1e1.Value && vic.FriendlyName == "M1 Abrams")) continue;
 
                 int rand = (randomChance.Value) ? UnityEngine.Random.Range(1, 100) : 0;
                 if (rand > randomChanceNum.Value) continue;
@@ -167,6 +167,7 @@ namespace M1A1Abrams
                 GAS.Create(Ammo_120mm.ap[sabot_m1ip.Value].ClipType.MinimalPattern[0], Ammo_120mm.heat[heat_m1ip.Value].ClipType.MinimalPattern[0]);
                 GAS.Add(gas, optic.slot.ExclusiveWeapons);
 
+                /*
                 Vector3 crows_pos = crows_alt_placement.Value ? new Vector3(1.4f, 1.1164f, -0.5873f) : new Vector3(0.7855f, 1.2855f, 0.5182f);
                 bool has_crows = is_m1ip ? crows_m1a1.Value : crows_m1e1.Value;
                 if (has_crows) {
@@ -176,6 +177,7 @@ namespace M1A1Abrams
                     if (!crows_alt_placement.Value)
                         vic.DesignatedCameraSlots[0].transform.localPosition = new Vector3(-0.1538f, 0.627f, -0.05f);
                 }
+                */
 
                 int flir_gen = is_m1ip ? flir_gen_m1ip.Value : flir_gen_m1.Value;
                 if (flir_gen > 1) {
@@ -261,7 +263,6 @@ namespace M1A1Abrams
                     vic._friendlyName += " SEP";
                 }
 
-
                 mainGunInfo.Name = "120mm gun M256";
                 mainGun.Impulse = 68000;
                 mainGun.CodexEntry = gun_m256;
@@ -271,14 +272,13 @@ namespace M1A1Abrams
                 dummy_tube.transform.parent = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN");
                 dummy_tube.transform.localScale = new Vector3(0f, 0f, 0f);
 
-                Transform smr_path = (vic.UniqueName == "M1") ? vic.transform.Find("M1_rig/M1_skinned") : vic.transform.Find("IPM1_rig/M1IP_skinned");
-                int gun_recoil_idx = (vic.UniqueName == "M1") ? 46 : 56;
+                Transform smr_path = (vic.UniqueName == "M1") ? vic.transform.Find("M1A0_mesh/M1A0 turret") : vic.transform.Find("M1IP_mesh/M1IP_turret");
+                int gun_recoil_idx = (vic.UniqueName == "M1") ? 13 : 9;
                 SkinnedMeshRenderer smr = smr_path.GetComponent<SkinnedMeshRenderer>();
                 Transform[] bones = smr.bones;
                 bones[gun_recoil_idx] = dummy_tube.transform;
                 smr.bones = bones;
-
-                
+     
                 GameObject gunTube = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/gun_recoil").gameObject;
                 gunTube.transform.Find("GUN/Gun Breech.001").GetComponent<MeshRenderer>().enabled = false;
           
@@ -314,7 +314,12 @@ namespace M1A1Abrams
                 mainGun.Feed.Start();
                 loadoutManager.RegisterAllBallistics();
 
-                vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/Gun Scripts/turret_gun").gameObject.SetActive(false);
+                vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/turret_gun").gameObject.SetActive(false);
+
+                if (vic.UniqueName == "M1IP") {
+                    vic_go.transform.Find("IPM1_rig/HULL/TURRET/M1 camo net/turret_gun").gameObject.SetActive(false);
+                }
+
                 vic_go.AddComponent<Util.AlreadyConverted>();
             }
 

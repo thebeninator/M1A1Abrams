@@ -40,6 +40,12 @@ namespace M1A1Abrams
                 t55.transform.Find("Gun Scripts/Sights (and FCS)/NVS").GetComponent<UsableOptic>().reticleMesh.Load();
             }
 
+            if (!ReticleMesh.cachedReticles.ContainsKey("M1_105_GAS_APFSDS"))
+            {
+                Vehicle m1ip = Resources.FindObjectsOfTypeAll<Vehicle>().Where(o => o.name == "_M1IP (variant)").First();
+                m1ip.transform.Find("Gun Scripts/Aux sight (GAS)").GetComponent<UsableOptic>().reticleMesh.Load();
+            }
+
             Vehicle m60a3 = Resources.FindObjectsOfTypeAll<Vehicle>().Where(o => o.name == "M60A3 TTS").First();
             m2_browning = m60a3.transform.Find("Cupola Scripts/12.7mm Machine Gun M85").gameObject;
             m2_gun_sight = m60a3.transform.Find("Cupola Scripts/M85 gunsight").gameObject;

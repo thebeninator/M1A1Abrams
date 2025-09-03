@@ -8,7 +8,7 @@ using GHPC.Camera;
 using GHPC.Player;
 using GHPC.Vehicle;
 
-[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.3.1A", "ATLAS")]
+[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.3.1B", "ATLAS")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace M1A1Abrams
@@ -47,7 +47,7 @@ namespace M1A1Abrams
 
             Ammo_120mm.Init();
             DUArmour.Init();
-            CROWS.Init();
+            //CROWS.Init();
             MPAT.Init();
             CITVManager.Init();
             M1A1.Init();

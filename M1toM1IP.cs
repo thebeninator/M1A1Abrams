@@ -19,7 +19,7 @@ namespace M1A1Abrams
 
             bool conversion_reqd = M1A1.m1_to_m1ip.Value;
 
-            if (prefab.name == "M1" && conversion_reqd)
+            if (prefab.name == "_M1 (variant)" && conversion_reqd)
             {
                 __state = true;
                 prefab = __instance.GetPrefabByUniqueName("M1IP");
