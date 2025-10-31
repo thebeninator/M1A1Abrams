@@ -220,7 +220,7 @@ namespace M1A1Abrams
             wsi_m2_browning.Role = WeaponSystemRole.RoofGun;
             wsi_m2_browning.PreAimWeapon = WeaponSystemRole.MainGun;
                          
-            (vic.InfoBroker._crewManager.GetCrewBrain(GHPC.Crew.CrewPosition.Gunner) as GHPC.Crew.GunnerBrain).Weapons.Add(wsi_m2_browning);
+            //(vic.InfoBroker._crewManager.GetCrewBrain(GHPC.Crew.CrewPosition.Gunner) as GHPC.Crew.GunnerBrain).Weapons.Add(wsi_m2_browning);
             vic._weaponsManager.Weapons = Util.AppendToArray(vic._weaponsManager.Weapons, wsi_m2_browning);
             vic._designatedCameraSlots = Util.AppendToArray(vic._designatedCameraSlots, fcs.MainOptic.slot);
             vic.AimablePlatforms = Util.AppendToArray(vic.AimablePlatforms, aimable_mount);

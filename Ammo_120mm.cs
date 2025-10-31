@@ -203,20 +203,26 @@ namespace M1A1Abrams
             ammo_m829a3.Coeff = 0.22f;
             ammo_m829a3.CachedIndex = -1;
 
+            string era_schema = Assembly.CreateQualifiedName("PactIncreasedLethality", "PactIncreasedLethality.EraSchema");
             string k5 = Assembly.CreateQualifiedName("PactIncreasedLethality", "PactIncreasedLethality.Kontakt5");
             string relikt = Assembly.CreateQualifiedName("PactIncreasedLethality", "PactIncreasedLethality.Relikt");
+            Type era_schema_type = Type.GetType(era_schema);
             Type k5_type = Type.GetType(k5);
             Type relikt_type = Type.GetType(relikt);
             if (k5_type != null)
             {
+                BindingFlags flags = BindingFlags.Static | BindingFlags.Public;
+                FieldInfo era_schema_so = era_schema_type.GetField("era_so", BindingFlags.Public | BindingFlags.Instance);
+                Func<Type, ArmorCodexScriptable> get_codex = type => (ArmorCodexScriptable)era_schema_so.GetValue(type.GetField("schema", flags).GetValue(null));
+
                 ammo_m829a3.ArmorOptimizations = new AmmoType.ArmorOptimization[] {
                     new AmmoType.ArmorOptimization() {
-                        Armor = (ArmorCodexScriptable)k5_type.GetField("kontakt5_so", BindingFlags.Static | BindingFlags.Public).GetValue(null),
+                        Armor = get_codex(k5_type),
                         RhaRatio = 0.25f
                     },
                     
                     new AmmoType.ArmorOptimization() {
-                        Armor = (ArmorCodexScriptable)relikt_type.GetField("rlkt_so", BindingFlags.Static | BindingFlags.Public).GetValue(null),
+                        Armor = get_codex(relikt_type),
                         RhaRatio = 0.25f
                     }                   
                 };

@@ -155,7 +155,7 @@ namespace M1A1Abrams
                 UsableOptic optic = vic.transform.Find("IPM1_rig/HULL/TURRET/Turret Scripts/GPS/Optic").GetComponent<UsableOptic>();
                 UsableOptic night_optic = optic.slot.LinkedNightSight.PairedOptic;
                 Transform gas = vic.transform.Find("IPM1_rig/HULL/TURRET/GUN/Gun Scripts/Aux sight (GAS)");
-                bool is_m1ip = vic.UniqueName == "M1IP" && vic.GetComponent<PreviouslyM1>() == null;
+                bool is_m1ip = vic.UniqueName == "M1IP Abrams" && vic.GetComponent<PreviouslyM1>() == null;
 
                 vic._friendlyName = (vic.FriendlyName == "M1IP") ? "M1A1" : "M1E1";
 
@@ -188,7 +188,7 @@ namespace M1A1Abrams
                     night_optic.slot.FLIRBlitMaterialOverride = Assets.flir_blit_mat_green_no_scan;
                 }
 
-                bool has_digital_enhancement = is_m1ip ? digital_enchancement_m1e1.Value : digital_enchancement_m1a1.Value;
+                bool has_digital_enhancement = is_m1ip ? digital_enchancement_m1a1.Value : digital_enchancement_m1e1.Value;
                 if (has_digital_enhancement) {
                     DigitalEnhancement digital_enhance = mainGun.FCS.gameObject.AddComponent<DigitalEnhancement>();
                     digital_enhance.original_blur = night_optic.slot.BaseBlur;
@@ -316,7 +316,7 @@ namespace M1A1Abrams
 
                 vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/turret_gun").gameObject.SetActive(false);
 
-                if (vic.UniqueName == "M1IP") {
+                if (vic.UniqueName == "M1IP Abrams") {
                     vic_go.transform.Find("IPM1_rig/HULL/TURRET/M1 camo net/turret_gun").gameObject.SetActive(false);
                 }
 
@@ -338,25 +338,28 @@ namespace M1A1Abrams
                 GameObject assem = citv_obj.transform.Find("assembly").gameObject;
                 GameObject glass = citv_obj.transform.Find("glass").gameObject;
 
-                assem.tag = "Penetrable";
-                glass.tag = "Penetrable";
-                assem.layer = 8;
-                glass.layer = 8;
-
                 assem.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
                 glass.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
                 citv_obj.AddComponent<HeatSource>().heat = 5f;
 
-                UniformArmor assem_armour = assem.AddComponent<UniformArmor>();
-                UniformArmor glass_armour = glass.AddComponent<UniformArmor>();
-                assem_armour.PrimarySabotRha = 40f;
-                assem_armour.PrimaryHeatRha = 40f;
+                GameObject assem_armour = assem.transform.Find("ARMOUR").gameObject;
+                GameObject glass_armour = glass.transform.Find("ARMOUR").gameObject;
 
-                glass_armour.PrimarySabotRha = 5f;
-                glass_armour.PrimaryHeatRha = 5f;
+                assem_armour.tag = "Penetrable";
+                glass_armour.tag = "Penetrable";
+                assem_armour.layer = 8;
+                glass_armour.layer = 8;
 
-                assem_armour._name = "CITV";
-                glass_armour._name = "CITV glass";
+                UniformArmor assem_u_armour = assem.AddComponent<UniformArmor>();
+                UniformArmor glass_u_armour = glass.AddComponent<UniformArmor>();
+                assem_u_armour.PrimarySabotRha = 40f;
+                assem_u_armour.PrimaryHeatRha = 40f;
+
+                glass_u_armour.PrimarySabotRha = 5f;
+                glass_u_armour.PrimaryHeatRha = 5f;
+
+                assem_u_armour._name = "CITV";
+                glass_u_armour._name = "CITV glass";
 
                 var bundle2 = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1assets/", "m256"));
                 m256_obj = bundle2.LoadAsset<GameObject>("m256.prefab");
