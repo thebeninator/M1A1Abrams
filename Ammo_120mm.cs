@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using GHPC.Effects;
 using GHPC.Weapons;
-using MelonLoader;
 using UnityEngine;
+using GHPC.Weaponry;
 
 namespace M1A1Abrams
 {
@@ -307,7 +306,7 @@ namespace M1A1Abrams
             clip_codex_m830a1.ClipType = clip_m830a1;
 
             m830a1_forward_frag.Name = "mpat forward frag";
-            m830a1_forward_frag.RhaPenetration = 250f;
+            m830a1_forward_frag.RhaPenetration = 100f;
             m830a1_forward_frag.MuzzleVelocity = 600f;
             m830a1_forward_frag.Category = AmmoType.AmmoCategory.Penetrator;
             m830a1_forward_frag.Mass = 0.80f;

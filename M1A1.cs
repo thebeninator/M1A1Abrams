@@ -13,6 +13,7 @@ using GHPC.AI.Sensors;
 using MelonLoader.Utils;
 using GHPC.Camera;
 using GHPC.Player;
+using GHPC.Weaponry;
 
 namespace M1A1Abrams
 {
@@ -135,6 +136,7 @@ namespace M1A1Abrams
             randomChance.Description = "M1IPs/M1s will have a random chance of being converted to M1A1s/M1E1s.";
             randomChanceNum = cfg.CreateEntry<int>("ConversionChance", 50);
         }
+
         public static IEnumerator Convert(GameState _)
         {
             foreach (Vehicle vic in M1A1AbramsMod.vics)
@@ -189,7 +191,8 @@ namespace M1A1Abrams
                 }
 
                 bool has_digital_enhancement = is_m1ip ? digital_enchancement_m1a1.Value : digital_enchancement_m1e1.Value;
-                if (has_digital_enhancement) {
+                if (has_digital_enhancement)
+                {
                     DigitalEnhancement digital_enhance = mainGun.FCS.gameObject.AddComponent<DigitalEnhancement>();
                     digital_enhance.original_blur = night_optic.slot.BaseBlur;
                     digital_enhance.slot = night_optic.slot;
@@ -201,7 +204,8 @@ namespace M1A1Abrams
                 bool has_du_package = is_m1ip ? du_package_m1ip.Value : du_package_m1.Value;
                 int du_gen = is_m1ip ? du_gen_m1ip.Value : du_gen_m1.Value;
                 vic_go.GetComponent<Rigidbody>().mass = has_du_package && vic.FriendlyName == "M1A1" ? 62781.3776f : 57152.6386f;
-                if (has_du_package && vic._friendlyName == "M1A1") {
+                if (has_du_package && vic._friendlyName == "M1A1")
+                {
                     vic._friendlyName += du_gen > 1 ? "HC" : "HA";
 
                     GameObject turret_cheeks = vic.transform.Find("IPM1_rig/HULL/TURRET").GetComponent<LateFollowTarget>()
@@ -298,14 +302,13 @@ namespace M1A1Abrams
 
                 LoadoutManager loadoutManager = vic.GetComponent<LoadoutManager>();
                 loadoutManager.TotalAmmoCounts = new int[] { m829Count.Value, m830Count.Value };
-                loadoutManager.LoadedAmmoTypes = new AmmoClipCodexScriptable[] { sabotClipCodex, heatClipCodex };
+                loadoutManager.LoadedAmmoList.AmmoClips = new AmmoClipCodexScriptable[] { sabotClipCodex, heatClipCodex };
                 loadoutManager._totalAmmoCount = 40;
 
                 for (int i = 0; i <= 2; i++)
                 {
                     GHPC.Weapons.AmmoRack rack = loadoutManager.RackLoadouts[i].Rack;
                     rack.ClipCapacity = i == 2 ? 4 : 18;
-                    rack.ClipTypes = new AmmoType.AmmoClip[] { sabotClipCodex.ClipType, heatClipCodex.ClipType };
                     Util.EmptyRack(rack);
                 }
 

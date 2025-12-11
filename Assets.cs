@@ -6,6 +6,7 @@ using GHPC.Vehicle;
 using MelonLoader.Utils;
 using Reticle;
 using UnityEngine;
+using GHPC.Weaponry;
 
 namespace M1A1Abrams
 {

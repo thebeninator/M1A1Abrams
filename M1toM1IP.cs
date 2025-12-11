@@ -8,21 +8,21 @@ using HarmonyLib;
 
 namespace M1A1Abrams
 {
-    public class PreviouslyM1 : MonoBehaviour { }
+    public class PreviouslyM1 : MonoBehaviour {}
 
-    [HarmonyPatch(typeof(UnitSpawner), "SpawnUnit", new Type[] { typeof(GameObject), typeof(UnitMetaData), typeof(WaypointHolder), typeof(Transform) })]
+    [HarmonyPatch(typeof(UnitSpawner), "SpawnUnit", new Type[] { typeof(string), typeof(UnitMetaData), typeof(WaypointHolder), typeof(Transform) })]
     public static class M1toM1IP
     {
-        private static void Prefix(out bool __state, UnitSpawner __instance, ref GameObject prefab)
+        private static void Prefix(out bool __state, UnitSpawner __instance, ref string uniqueName)
         {
             __state = false;
 
             bool conversion_reqd = M1A1.m1_to_m1ip.Value;
 
-            if (prefab.name == "_M1 (variant)" && conversion_reqd)
+            if (uniqueName == "M1" && conversion_reqd)
             {
                 __state = true;
-                prefab = __instance.GetPrefabByUniqueName("M1IP");
+                uniqueName = "M1IP";
             }
         }
 

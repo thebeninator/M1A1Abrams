@@ -13,6 +13,7 @@ using GHPC.Thermals;
 using GHPC.Effects;
 using GHPC.Player;
 using GHPC.Camera;
+using GHPC.Weaponry;
 
 namespace M1A1Abrams
 {

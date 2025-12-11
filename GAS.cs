@@ -2,6 +2,7 @@
 using GHPC.Weapons;
 using Reticle;
 using UnityEngine;
+using GHPC.Weaponry;
 
 namespace M1A1Abrams
 {

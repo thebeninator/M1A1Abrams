@@ -3,6 +3,7 @@ using UnityEngine;
 using GHPC.Weapons;
 using HarmonyLib;
 using GHPC.Player;
+using GHPC.UI.Hud;
 
 namespace M1A1Abrams
 {
@@ -25,8 +26,6 @@ namespace M1A1Abrams
 
             if (player_manager.CurrentPlayerUnit.gameObject.GetInstanceID() != gameObject.GetInstanceID()) return;
 
-            Ammo_120mm.clip_m830a1.Name = activated ? "M830A1 MPAT-T [Proximity]" : "M830A1 MPAT-T";
-
             if (Input.GetKey(KeyCode.Mouse2) && cd <= 0f && weapon.CurrentAmmoType == Ammo_120mm.ammo_m830a1)
             {
                 cd = 0.2f;
@@ -38,10 +37,10 @@ namespace M1A1Abrams
 
     public class MPAT : MonoBehaviour
     {
-        private GHPC.Weapons.LiveRound live_round;
-        private static GameObject prox_fuse;
-        private static HashSet<string> prox_ammos = new HashSet<string>();
-        private bool detonated = false;
+        internal GHPC.Weapons.LiveRound live_round;
+        internal static GameObject prox_fuse;
+        internal static HashSet<string> prox_ammos = new HashSet<string>();
+        public bool detonated = false;
 
         // must be called at least once 
         public static void Init()
@@ -62,8 +61,13 @@ namespace M1A1Abrams
         void Detonate()
         {
             if (detonated) return;
-            live_round.Detonate();
             detonated = true;
+            live_round._terrainHit = false;
+            live_round._didTerrainHit = false;
+            live_round._fuzeCompleted = true;
+            live_round._materialHit = GHPC.Effects.ParticleEffectsManager.SurfaceMaterial.None;
+            live_round.createExplosion(hitSurface: false, 0f, Vector3.zero, 0.03f);
+            live_round.Detonate();
         }
 
         void Update()
@@ -88,55 +92,68 @@ namespace M1A1Abrams
                     Detonate();
 
         }
+    }
 
-        [HarmonyPatch(typeof(GHPC.Weapons.LiveRound), "Start")]
-        public static class SpawnProximityFuse
+    [HarmonyPatch(typeof(WeaponHud), "Update")]
+    public static class MPATProximityHud
+    {
+        private static void Postfix(WeaponHud __instance)
         {
-            private static void Prefix(GHPC.Weapons.LiveRound __instance)
+            MPAT_Switch mpat_switch = __instance?._playerInput?.CurrentPlayerUnit?.GetComponent<MPAT_Switch>();
+
+            if (mpat_switch == null || !mpat_switch.activated) return;
+
+            __instance._hudText.text = __instance._sb.ToString() + "\nMPAT Proximity";
+        }
+    }
+
+    [HarmonyPatch(typeof(GHPC.Weapons.LiveRound), "Start")]
+    public static class SpawnProximityFuse
+    {
+        private static void Prefix(GHPC.Weapons.LiveRound __instance)
+        {
+            if (MPAT.prox_ammos.Contains(__instance.Info.Name) && __instance.gameObject.transform.Find("mpat prox fuse(Clone)") == null)
             {
-                if (prox_ammos.Contains(__instance.Info.Name) && __instance.gameObject.transform.Find("mpat prox fuse(Clone)") == null)
-                {
-                    GameObject p = GameObject.Instantiate(prox_fuse, __instance.transform);
-                    p.GetComponent<MPAT>().live_round = __instance;
-                    p.SetActive(__instance.Shooter.gameObject.GetComponent<MPAT_Switch>().activated);
-                }
-                else if (__instance.gameObject.transform.Find("mpat prox fuse(Clone)"))
-                {
-                    GameObject.DestroyImmediate(__instance.gameObject.transform.Find("mpat prox fuse(Clone)").gameObject);
-                }
+                GameObject p = GameObject.Instantiate(MPAT.prox_fuse, __instance.transform);
+                p.GetComponent<MPAT>().live_round = __instance;
+                p.SetActive(__instance.Shooter.gameObject.GetComponent<MPAT_Switch>().activated);
+            }
+            else if (__instance.gameObject.transform.Find("mpat prox fuse(Clone)"))
+            {
+                GameObject.DestroyImmediate(__instance.gameObject.transform.Find("mpat prox fuse(Clone)").gameObject);
             }
         }
+    }
 
-        [HarmonyPatch(typeof(GHPC.Weapons.LiveRound), "createExplosion")]
-        public class ForwardBurst
+    [HarmonyPatch(typeof(GHPC.Weapons.LiveRound), "createExplosion")]
+    public class ForwardBurst
+    {
+        private static bool Prefix(GHPC.Weapons.LiveRound __instance)
         {
-            private static bool Prefix(GHPC.Weapons.LiveRound __instance)
+            if (!__instance.gameObject.GetComponentInChildren<MPAT>()) return true;
+            if (!__instance.gameObject.GetComponentInChildren<MPAT>().detonated) return true;
+
+            for (int i = 0; i < 25; i++)
             {
-                if (__instance.Info.Name != "M830A1 MPAT-T") return true;
-                if (!__instance.gameObject.GetComponentInChildren<MPAT>()) return true;
-                if (!__instance.gameObject.GetComponentInChildren<MPAT>().detonated) return true;
-
-                for (int i = 0; i < 25; i++)
-                {
-                    GHPC.Weapons.LiveRound component;
-                    component = LiveRoundMarshaller.Instance.GetRoundOfVisualType(LiveRoundMarshaller.LiveRoundVisualType.Spall)
-                        .GetComponent<GHPC.Weapons.LiveRound>();
-                    component.Info = Ammo_120mm.m830a1_forward_frag;
-                    component.CurrentSpeed = 600f;
-                    component.MaxSpeed = 600f;
-                    component.IsSpall = false;
-                    component.Shooter = __instance.Shooter;
-                    component.transform.position = __instance.transform.position;
-                    component.transform.forward = Quaternion.Euler(
-                        UnityEngine.Random.Range(-5f, 5f),
-                        UnityEngine.Random.Range(-5f, 5f),
-                        UnityEngine.Random.Range(-5f, 5f)) * __instance.transform.forward;
-                    component.Init(__instance, null);
-                    component.name = "mpat forward frag " + i;
-                }
-
-                return true;
+                GHPC.Weapons.LiveRound component;
+                component = LiveRoundMarshaller.Instance.GetRoundOfVisualType(LiveRoundMarshaller.LiveRoundVisualType.Spall)
+                    .GetComponent<GHPC.Weapons.LiveRound>();
+                component.Info = Ammo_120mm.m830a1_forward_frag;
+                component.CurrentSpeed = 600f;
+                component.MaxSpeed = 600f;
+                component.IsSpall = false;
+                component.Shooter = __instance.Shooter;
+                component.transform.position = __instance.transform.position;
+                component.transform.forward = Quaternion.Euler(
+                    UnityEngine.Random.Range(-5f, 5f),
+                    UnityEngine.Random.Range(-5f, 5f),
+                    UnityEngine.Random.Range(-5f, 5f)
+                ) * __instance.transform.forward;
+                component.Init(__instance, null);
+                component.name = "mpat forward frag " + i;
             }
+
+            return true;
         }
     }
 }

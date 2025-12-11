@@ -4,11 +4,9 @@ using M1A1Abrams;
 using GHPC.State;
 using System.Collections;
 using UnityEngine;
-using GHPC.Camera;
-using GHPC.Player;
 using GHPC.Vehicle;
 
-[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.3.1B2", "ATLAS")]
+[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.3.1B3", "ATLAS")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace M1A1Abrams
@@ -38,6 +36,7 @@ namespace M1A1Abrams
             }
 
             if (Util.menu_screens.Contains(scene_name)) return;
+
 
             gameManager = GameObject.Find("_APP_GHPC_");
 

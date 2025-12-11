@@ -17,7 +17,11 @@ namespace M1A1Abrams
             "t64_menu"
         };
 
-        public class AlreadyConverted : MonoBehaviour {}
+        public class AlreadyConverted : MonoBehaviour {
+            void Awake() {
+                enabled = false;
+            }
+        }
 
         public static T[] AppendToArray<T>(T[] array, T new_item) { 
             List<T> values = new List<T>();
