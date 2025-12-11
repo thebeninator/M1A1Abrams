@@ -1,3 +1,6 @@
+THIS MOD REQUIRES THE VEHICLE PRELOADER!!!!!!!!
+https://github.com/thebeninator/VehiclePreloader/releases/latest
+
 # Attributions
 M153 CROWS model from: "MRAP Oshkosh (West)" (https://marketplace.vigilante.us/product/mrap-oshkosh-west/) by Vigilante
 
