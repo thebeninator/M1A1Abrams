@@ -3,10 +3,14 @@ using GHPC.Weapons;
 using Reticle;
 using UnityEngine;
 using GHPC.Weaponry;
+using ModUtil;
+using GHPC.Vehicle;
+using GHPC.Equipment.Optics;
+using System.Linq;
 
 namespace M1A1Abrams
 {
-    public class GAS
+    public class GAS : Module
     {
         public static ReticleSO reticleSO_heat;
         public static ReticleMesh.CachedReticle reticle_cached_heat;
@@ -14,19 +18,27 @@ namespace M1A1Abrams
         public static ReticleSO reticleSO_ap;
         public static ReticleMesh.CachedReticle reticle_cached_ap;
 
+        public override void LoadDynamicAssets()
+        {
+            if (!AssetUtil.VehicleInMission("_M1 (variant)") && !M1A1.m1e1.Value && ReticleMesh.cachedReticles.ContainsKey("M1_105_GAS_APFSDS")) return;
+
+            Vehicle m1ip = AssetUtil.LoadVanillaVehicle("M1IP");
+            m1ip.transform.Find("Gun Scripts/Aux sight (GAS)").GetComponent<UsableOptic>().reticleMesh.Load();
+        }
+
         public static void Add(Transform gas, WeaponSystem[] exclusives) {
             CameraSlot slot = gas.GetComponent<CameraSlot>();
             slot.ExclusiveWeapons = exclusives;
            
             ReticleMesh gas_ap = gas.Find("Reticle Mesh").gameObject.GetComponent<ReticleMesh>();
-            gas_ap.reticleSO = GAS.reticleSO_ap;
-            gas_ap.reticle = GAS.reticle_cached_ap;
+            gas_ap.reticleSO = reticleSO_ap;
+            gas_ap.reticle = reticle_cached_ap;
             gas_ap.SMR = null;
             gas_ap.Load();
 
             ReticleMesh gas_heat = gas.Find("Reticle Mesh HEAT").gameObject.GetComponent<ReticleMesh>();
-            gas_heat.reticleSO = GAS.reticleSO_heat;
-            gas_heat.reticle = GAS.reticle_cached_heat;
+            gas_heat.reticleSO = reticleSO_heat;
+            gas_heat.reticle = reticle_cached_heat;
             gas_heat.SMR = null;
             gas_heat.Load();
         }

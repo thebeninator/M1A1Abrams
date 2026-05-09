@@ -6,10 +6,11 @@ using GHPC.Effects;
 using GHPC.Weapons;
 using UnityEngine;
 using GHPC.Weaponry;
+using ModUtil;
 
 namespace M1A1Abrams
 {
-    public class Ammo_120mm
+    public class Ammo_120mm : ModUtil.Module
     {
         public static Dictionary<string, AmmoClipCodexScriptable> ap;
         public static Dictionary<string, AmmoClipCodexScriptable> heat;
@@ -50,28 +51,28 @@ namespace M1A1Abrams
         public static AmmoCodexScriptable ammo_codex_m829a3;
         public static AmmoType ammo_m829a3;
 
-        public static AmmoClipCodexScriptable clip_codex_m1028;
-        public static AmmoType.AmmoClip clip_m1028;
-        public static AmmoCodexScriptable ammo_codex_m1028;
-        public static AmmoType ammo_m1028;
-
         public static GameObject ammo_m827_vis = null;
         public static GameObject ammo_m829_vis = null;
         public static GameObject ammo_m829a1_vis = null;
         public static GameObject ammo_m829a2_vis = null;
         public static GameObject ammo_m829a3_vis = null;
-
-
-        public static GameObject ammo_m1028_vis = null;
         public static GameObject ammo_m830_vis = null;
         public static GameObject ammo_m830a1_vis = null;
 
-        public static AmmoType canister_ball;
 
-        public static void Init()
+        public override void UnloadDynamicAssets()
         {
-            if (ammo_m827 != null) return;
+            GameObject.DestroyImmediate(ammo_m827_vis);
+            GameObject.DestroyImmediate(ammo_m829_vis);
+            GameObject.DestroyImmediate(ammo_m829a1_vis);
+            GameObject.DestroyImmediate(ammo_m829a2_vis);
+            GameObject.DestroyImmediate(ammo_m829a3_vis);
+            GameObject.DestroyImmediate(ammo_m830_vis);
+            GameObject.DestroyImmediate(ammo_m830a1_vis);
+        }
 
+        public override void LoadDynamicAssets()
+        {
             // xm827
             ammo_m827 = new AmmoType();
             Util.ShallowCopy(ammo_m827, Assets.ammo_m833);
@@ -219,14 +220,14 @@ namespace M1A1Abrams
                         Armor = get_codex(k5_type),
                         RhaRatio = 0.25f
                     },
-                    
+
                     new AmmoType.ArmorOptimization() {
                         Armor = get_codex(relikt_type),
                         RhaRatio = 0.25f
-                    }                   
+                    }
                 };
             }
-                    
+
             ammo_codex_m829a3 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
             ammo_codex_m829a3.AmmoType = ammo_m829a3;
             ammo_codex_m829a3.name = "ammo_m829a3";
@@ -326,6 +327,7 @@ namespace M1A1Abrams
                 Flags = ParticleEffectsManager.ImpactModifierFlags.Small,
                 MinFilterStrictness = ParticleEffectsManager.FilterStrictness.Low
             };
+            m830a1_forward_frag.CachedIndex = -1;
 
             MPAT.AddMPATFuse(ammo_m830a1);
 
@@ -371,76 +373,15 @@ namespace M1A1Abrams
             ammo_m830a1.VisualModel.GetComponent<AmmoStoredVisual>().AmmoType = ammo_m830a1;
             ammo_m830a1.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m830a1;
 
-            // canister         
-            ammo_m1028 = new AmmoType();
-            Util.ShallowCopy(ammo_m1028, ammo_m827);
-            ammo_m1028.CachedIndex = -1;
-            ammo_m1028.Name = "M1028 APERS";
-            ammo_m1028.Category = AmmoType.AmmoCategory.Penetrator;
-            ammo_m1028.Caliber = 120;
-            ammo_m1028.RhaPenetration = 0;
-            ammo_m1028.TntEquivalentKg = 0f;
-            ammo_m1028.MuzzleVelocity = 800f;
-            ammo_m1028.Mass = 0.80f;
-            ammo_m1028.DetonateSpallCount = 0;
-            ammo_m1028.AlwaysProduceBlast = false;
-            ammo_m1028.NoPenSpall = true;
-            ammo_m1028.SpallMultiplier = 0f;
-            ammo_m1028.SectionalArea = 0.0008f;
-            ammo_m1028.EdgeSetback = 0.001f;
-            ammo_m1028.Coeff = 0.22f;
-            ammo_m1028.RangedFuseTime = 0.005f;
-            ammo_m1028.DetonateEffect = null;
-            ammo_m1028.TerrainImpactEffect = null;
-            ammo_m1028.ImpactEffectDescriptor = new ParticleEffectsManager.ImpactEffectDescriptor()
-            {
-                HasImpactEffect = false
-            };
-            ammo_m1028.ImpactAudio = GHPC.Audio.ImpactAudioType.Generic;
+            Util.CacheAmmo(ammo_m827);
+            Util.CacheAmmo(ammo_m829);
+            Util.CacheAmmo(ammo_m829a1);
+            Util.CacheAmmo(ammo_m829a2);
+            Util.CacheAmmo(ammo_m829a3);
+            Util.CacheAmmo(m830a1_forward_frag);
+            Util.CacheAmmo(ammo_m830);
+            Util.CacheAmmo(ammo_m830a1);
 
-            ammo_codex_m1028 = ScriptableObject.CreateInstance<AmmoCodexScriptable>();
-            ammo_codex_m1028.AmmoType = ammo_m1028;
-            ammo_codex_m1028.name = "ammo_m1028";
-
-            clip_m1028 = new AmmoType.AmmoClip();
-            clip_m1028.Capacity = 1;
-            clip_m1028.Name = "M1028 APERS";
-            clip_m1028.MinimalPattern = new AmmoCodexScriptable[1];
-            clip_m1028.MinimalPattern[0] = ammo_codex_m1028;
-
-            clip_codex_m1028 = ScriptableObject.CreateInstance<AmmoClipCodexScriptable>();
-            clip_codex_m1028.name = "clip_m1028";
-            clip_codex_m1028.CompatibleWeaponSystems = new WeaponSystemCodexScriptable[1];
-            clip_codex_m1028.ClipType = clip_m1028;
-
-            ammo_m1028_vis = GameObject.Instantiate(Assets.ammo_m833.VisualModel);
-            ammo_m1028_vis.name = "M1028 visual";
-            ammo_m1028.VisualModel = ammo_m1028_vis;
-            ammo_m1028.VisualModel.GetComponent<AmmoStoredVisual>().AmmoType = ammo_m1028;
-            ammo_m1028.VisualModel.GetComponent<AmmoStoredVisual>().AmmoScriptable = ammo_codex_m1028;
-
-            canister_ball = new AmmoType();
-            Util.ShallowCopy(canister_ball, Resources.FindObjectsOfTypeAll<AmmoCodexScriptable>().Where(o => o.name == "ammo_762NATO").First().AmmoType);
-            canister_ball.Name = "Canister Ball";
-            canister_ball.CachedIndex = -1;
-            canister_ball.RhaPenetration = 120f;
-            canister_ball.MuzzleVelocity = 800f;
-            // 800 gram pellet doesn't really make sense but any lower and it will drop like a rock
-            canister_ball.Mass = 0.80f;
-            canister_ball.SectionalArea = 0.0008f;
-            canister_ball.Coeff = 0.22f;
-            canister_ball.UseTracer = false;
-            canister_ball.CertainRicochetAngle = 10f;
-            canister_ball.SpallMultiplier = 0f;
-            canister_ball.Caliber = 1f;
-            canister_ball.NoPenSpall = true;
-            canister_ball.ImpactEffectDescriptor = new ParticleEffectsManager.ImpactEffectDescriptor()
-            {
-                HasImpactEffect = false,
-            };
-
-            canister_ball.VisualType = LiveRoundMarshaller.LiveRoundVisualType.Invisible;
-                
             ap = new Dictionary<string, AmmoClipCodexScriptable>()
             {
                 ["M827"] = clip_codex_m827,

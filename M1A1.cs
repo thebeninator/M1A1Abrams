@@ -14,10 +14,11 @@ using MelonLoader.Utils;
 using GHPC.Camera;
 using GHPC.Player;
 using GHPC.Weaponry;
+using ModUtil;
 
 namespace M1A1Abrams
 {
-    public static class M1A1
+    public class M1A1 : Module
     {
         static MelonPreferences_Entry<string> sabot_m1;
         static MelonPreferences_Entry<string> sabot_m1ip;
@@ -33,7 +34,7 @@ namespace M1A1Abrams
         static MelonPreferences_Entry<bool> rotate_azimuth_m1;
         static MelonPreferences_Entry<bool> rotate_azimuth_m1ip;
 
-        static MelonPreferences_Entry<bool> m1e1;
+        public static MelonPreferences_Entry<bool> m1e1;
         static MelonPreferences_Entry<int> randomChanceNum;
         static MelonPreferences_Entry<bool> randomChance;
         static MelonPreferences_Entry<bool> citv_m1a1;
@@ -61,8 +62,6 @@ namespace M1A1Abrams
         static WeaponSystemCodexScriptable gun_m256;
         static WeaponSystemCodexScriptable gun_m256a1;
 
-        static GameObject citv_obj;
-        static GameObject m256_obj;
         static GameObject addon_turret;
         static GameObject addon_hull;
         static GameObject addon_turret_l55;
@@ -145,7 +144,7 @@ namespace M1A1Abrams
 
                 GameObject vic_go = vic.gameObject;
 
-                if (vic_go.GetComponent<Util.AlreadyConverted>() != null) continue;
+                if (vic_go.GetComponent<AlreadyConverted>() != null) continue;
                 if (vic.FriendlyName != "M1IP" && !(m1e1.Value && vic.FriendlyName == "M1 Abrams")) continue;
 
                 int rand = (randomChance.Value) ? UnityEngine.Random.Range(1, 100) : 0;
@@ -168,18 +167,6 @@ namespace M1A1Abrams
 
                 GAS.Create(Ammo_120mm.ap[sabot_m1ip.Value].ClipType.MinimalPattern[0], Ammo_120mm.heat[heat_m1ip.Value].ClipType.MinimalPattern[0]);
                 GAS.Add(gas, optic.slot.ExclusiveWeapons);
-
-                /*
-                Vector3 crows_pos = crows_alt_placement.Value ? new Vector3(1.4f, 1.1164f, -0.5873f) : new Vector3(0.7855f, 1.2855f, 0.5182f);
-                bool has_crows = is_m1ip ? crows_m1a1.Value : crows_m1e1.Value;
-                if (has_crows) {
-                    vic.transform.Find("IPM1_rig/HULL/TURRET/CUPOLA/CUPOLA_GUN").localScale = Vector3.zero;
-                    CROWS.Add(vic, vic.transform.Find("IPM1_rig/HULL/TURRET"), crows_pos);
-
-                    if (!crows_alt_placement.Value)
-                        vic.DesignatedCameraSlots[0].transform.localPosition = new Vector3(-0.1538f, 0.627f, -0.05f);
-                }
-                */
 
                 int flir_gen = is_m1ip ? flir_gen_m1ip.Value : flir_gen_m1.Value;
                 if (flir_gen > 1) {
@@ -231,7 +218,7 @@ namespace M1A1Abrams
 
                 bool has_citv = is_m1ip ? citv_m1a1.Value : citv_m1e1.Value;
                 if (has_citv) {
-                    GameObject c = GameObject.Instantiate(citv_obj, vic.transform.Find("IPM1_rig/HULL/TURRET"));
+                    GameObject c = GameObject.Instantiate(Assets.citv_obj, vic.transform.Find("IPM1_rig/HULL/TURRET"));
                     c.transform.localPosition = new Vector3(-0.6794f, 0.9341f, 0.4348f);
                     c.transform.localEulerAngles = new Vector3(0f, 0f, 0f);
 
@@ -286,7 +273,7 @@ namespace M1A1Abrams
                 GameObject gunTube = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN/gun_recoil").gameObject;
                 gunTube.transform.Find("GUN/Gun Breech.001").GetComponent<MeshRenderer>().enabled = false;
           
-                GameObject _m256_obj = GameObject.Instantiate(m256_obj, gunTube.transform);
+                GameObject _m256_obj = GameObject.Instantiate(Assets.m256_obj, gunTube.transform);
                 _m256_obj.transform.localPosition = new Vector3(0f, 0.0064f, -1.9416f);
                 
                 Transform muzzleFlashes = mainGun.MuzzleEffects[1].transform;
@@ -323,58 +310,16 @@ namespace M1A1Abrams
                     vic_go.transform.Find("IPM1_rig/HULL/TURRET/M1 camo net/turret_gun").gameObject.SetActive(false);
                 }
 
-                vic_go.AddComponent<Util.AlreadyConverted>();
+                vic_go.AddComponent<AlreadyConverted>();
             }
 
             yield break;
         }
 
         public static void Init()
-        {
-            if (citv_obj == null)
-            {
-                var bundle = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1assets/", "citv"));
-                citv_obj = bundle.LoadAsset<GameObject>("citv.prefab");
-                citv_obj.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                citv_obj.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
-
-                GameObject assem = citv_obj.transform.Find("assembly").gameObject;
-                GameObject glass = citv_obj.transform.Find("glass").gameObject;
-
-                assem.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
-                glass.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
-                citv_obj.AddComponent<HeatSource>().heat = 5f;
-
-                GameObject assem_armour = assem.transform.Find("ARMOUR").gameObject;
-                GameObject glass_armour = glass.transform.Find("ARMOUR").gameObject;
-
-                assem_armour.tag = "Penetrable";
-                glass_armour.tag = "Penetrable";
-                assem_armour.layer = 8;
-                glass_armour.layer = 8;
-
-                UniformArmor assem_u_armour = assem.AddComponent<UniformArmor>();
-                UniformArmor glass_u_armour = glass.AddComponent<UniformArmor>();
-                assem_u_armour.PrimarySabotRha = 40f;
-                assem_u_armour.PrimaryHeatRha = 40f;
-
-                glass_u_armour.PrimarySabotRha = 5f;
-                glass_u_armour.PrimaryHeatRha = 5f;
-
-                assem_u_armour._name = "CITV";
-                glass_u_armour._name = "CITV glass";
-
-                var bundle2 = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1assets/", "m256"));
-                m256_obj = bundle2.LoadAsset<GameObject>("m256.prefab");
-                m256_obj.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                m256_obj.transform.localScale = new Vector3(0.75f, 0.75f, 0.8f);
-                m256_obj.GetComponent<MeshRenderer>().material.shader = Shader.Find("Standard (FLIR)");
-                m256_obj.AddComponent<HeatSource>().heat = 5f;
-            }
-            
+        {            
             if (gun_m256 == null)
             {
-                // m256
                 gun_m256 = ScriptableObject.CreateInstance<WeaponSystemCodexScriptable>();
                 gun_m256.name = "gun_m256";
                 gun_m256.CaliberMm = 120;

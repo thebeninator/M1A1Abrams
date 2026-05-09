@@ -2,10 +2,11 @@
 using UnityEngine;
 using System.IO;
 using MelonLoader.Utils;
+using ModUtil;
 
 namespace M1A1Abrams
 {
-    public class DUArmour
+    public class DUArmour : Module
     {
         static Material gen1_du_aar_mat;
         static ArmorCodexScriptable gen1_du_armor_codex;
@@ -19,9 +20,8 @@ namespace M1A1Abrams
         public static Material[] du_aar_mats;
         public static ArmorCodexScriptable[] du_armor_codexes;
 
-        public static void Init() {
-            if (gen1_du_armor_codex != null) return;
-
+        public override void LoadStaticAssets()
+        {
             AssetBundle mats = AssetBundle.LoadFromFile(Path.Combine(MelonEnvironment.ModsDirectory + "/m1a1assets/", "du_mats"));
             gen1_du_aar_mat = mats.LoadAsset<Material>("gen1.mat");
             gen1_du_aar_mat.hideFlags = HideFlags.DontUnloadUnusedAsset;
