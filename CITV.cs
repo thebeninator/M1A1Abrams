@@ -7,9 +7,65 @@ using GHPC.Weapons;
 using System.Reflection;
 using GHPC.Utility;
 using GHPC;
+using GHPC.Crew;
+using HarmonyLib;
 
 namespace M1A1Abrams
 {
+    [HarmonyPatch(typeof(CrewManager), "DisableGunner")]
+    public class CITVOverrideGunnerDeath
+    {
+        public static bool Prefix(CrewManager __instance)
+        {
+            if (!__instance.Unit.transform.GetComponentInChildren<CITV>(true)) return true;
+          
+            __instance.DisableCrewMemberBase(CrewPosition.Gunner);
+
+            if (__instance.GetCrewBrain(CrewPosition.Commander).Incapacitated)
+            {
+                return true;
+            }
+
+            __instance.GetCrewBrain(CrewPosition.Gunner).Suspended = false;
+
+            return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(CrewManager), "DisableCommander")]
+    public class CITVOverrideCommanderDeath
+    {
+        public static bool Prefix(CrewManager __instance)
+        {
+            if (!__instance.Unit.transform.GetComponentInChildren<CITV>(true)) return true;
+
+            if (__instance.GetCrewBrain(CrewPosition.Gunner).Incapacitated)
+            {
+                __instance.Unit.NotifyCannotShoot();
+            }
+
+            return true;
+        }
+    }
+
+    [HarmonyPatch(typeof(CrewManager), "IsCrewMemberConscious")]
+    public class CITVOverrideConscious
+    {
+        public static bool Prefix(CrewManager __instance, CrewPosition position, ref bool __result)
+        {
+            if (!__instance.Unit.transform.GetComponentInChildren<CITV>(true)) return true;
+            if (position != CrewPosition.Gunner) return true;
+
+            if (__instance.GetCrewBrain(CrewPosition.Gunner).Incapacitated)
+            {
+                __result = false;
+                return false;
+            }
+
+            return true;
+        }
+    }
+
     public class CITVManager : MonoBehaviour {
         public GameObject monitor;
         public GameObject wfov;

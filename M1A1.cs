@@ -59,6 +59,8 @@ namespace M1A1Abrams
 
         public static MelonPreferences_Entry<bool> m1_to_m1ip;
 
+        public static MelonPreferences_Entry<bool> original_rack_size;
+
         static WeaponSystemCodexScriptable gun_m256;
         static WeaponSystemCodexScriptable gun_m256a1;
 
@@ -74,6 +76,9 @@ namespace M1A1Abrams
             m829Count = cfg.CreateEntry<int>("M829", 22);
             m829Count.Description = "How many rounds of M829 (APFSDS), M830 (HEAT) each M1A1 should carry. Maximum of 40 rounds total. Bring in at least one M829 round.";
             m830Count = cfg.CreateEntry<int>("M830", 18);
+
+            original_rack_size = cfg.CreateEntry<bool>("Vanilla Ammo Capacity", false);
+            original_rack_size.Description = "Carry a total of 52 rounds instead of 40.";
 
             sabot_m1 = cfg.CreateEntry<string>("AP Round (M1E1)", "M827");
             sabot_m1.Description = "Customize which rounds M1A1s/M1E1s use";
@@ -290,13 +295,17 @@ namespace M1A1Abrams
                 LoadoutManager loadoutManager = vic.GetComponent<LoadoutManager>();
                 loadoutManager.TotalAmmoCounts = new int[] { m829Count.Value, m830Count.Value };
                 loadoutManager.LoadedAmmoList.AmmoClips = new AmmoClipCodexScriptable[] { sabotClipCodex, heatClipCodex };
-                loadoutManager._totalAmmoCount = 40;
 
-                for (int i = 0; i <= 2; i++)
+                if (!original_rack_size.Value)
                 {
-                    GHPC.Weapons.AmmoRack rack = loadoutManager.RackLoadouts[i].Rack;
-                    rack.ClipCapacity = i == 2 ? 4 : 18;
-                    Util.EmptyRack(rack);
+                    loadoutManager._totalAmmoCount = 40;
+
+                    for (int i = 0; i <= 2; i++)
+                    {
+                        GHPC.Weapons.AmmoRack rack = loadoutManager.RackLoadouts[i].Rack;
+                        rack.ClipCapacity = i == 2 ? 4 : 18;
+                        Util.EmptyRack(rack);
+                    }
                 }
 
                 loadoutManager.SpawnCurrentLoadout();

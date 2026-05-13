@@ -18,6 +18,13 @@ namespace M1A1Abrams
         public static ReticleSO reticleSO_ap;
         public static ReticleMesh.CachedReticle reticle_cached_ap;
 
+
+        public override void UnloadDynamicAssets()
+        {
+            ScriptableObject.DestroyImmediate(reticleSO_heat);
+            ScriptableObject.DestroyImmediate(reticleSO_ap);
+        }
+
         public override void LoadDynamicAssets()
         {
             if (!AssetUtil.VehicleInMission("_M1 (variant)") && !M1A1.m1e1.Value && ReticleMesh.cachedReticles.ContainsKey("M1_105_GAS_APFSDS")) return;
