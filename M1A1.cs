@@ -6,11 +6,7 @@ using GHPC.Weapons;
 using GHPC.Equipment.Optics;
 using GHPC.Vehicle;
 using GHPC.Utility;
-using System.IO;
 using GHPC;
-using GHPC.Thermals;
-using GHPC.AI.Sensors;
-using MelonLoader.Utils;
 using GHPC.Camera;
 using GHPC.Player;
 using GHPC.Weaponry;
@@ -246,7 +242,6 @@ namespace M1A1Abrams
                     vic.TargetSpotterSettings._sightDistance = 4500f;
                     vic.TargetSpotterSettings._nightSightDistanceIdeal = 4500f;
                     vic.TargetSpotterSettings._nightSightDistancePassive = 4500f;
-                    vic.transform.Find("Unit AI").GetComponent<TankTargetSensor>()._spotTimeMax = 2f;
 
                     vic._friendlyName += "+";
                 }
