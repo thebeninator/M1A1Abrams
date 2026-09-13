@@ -19,6 +19,8 @@ Features the preset system for customizable randomization
 
 <img width="1146" height="611" alt="how_the_preset_system_works" src="https://github.com/user-attachments/assets/a1db3167-fe3e-4bc4-a45f-47e382da0fbd" />
 
+please be aware that if you intend on using the preset system you MUST be on melonloader version v0.6.1 (older may work but i have not tested it)
+
 ---
 
 <p>
