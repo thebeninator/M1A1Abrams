@@ -66,7 +66,8 @@ namespace M1A1Abrams
         }
     }
 
-    public class CITVManager : MonoBehaviour {
+    public class CITVManager : MonoBehaviour 
+    {
         public GameObject monitor;
         public GameObject wfov;
         public GameObject nfov;
@@ -94,7 +95,8 @@ namespace M1A1Abrams
             }
         }
 
-        public static void Init() {
+        public static void Init() 
+        {
             if (GameObject.Find("CITV manager") != null) return;
 
             GameObject manager_obj = new GameObject("CITV manager");
@@ -102,7 +104,8 @@ namespace M1A1Abrams
             CITVManager manager = manager_obj.AddComponent<CITVManager>();           
         }
 
-        void Awake() {
+        void Awake() 
+        {
             canvas = GameObject.Find("_APP_GHPC_").transform.Find("UIHUDCanvas");
             _3d_reticle = canvas.Find("3P aim reticle");
 
@@ -119,7 +122,8 @@ namespace M1A1Abrams
             max_distance = typeof(GHPC.Camera.BufferedCameraFollow).GetField("MAX_AIM_DISTANCE", BindingFlags.Static | BindingFlags.NonPublic);
         }
 
-        void Update() {
+        void Update() 
+        {
             CameraSlot cam_slot = CameraManager.Instance._currentCamSlot;
             if (cam_slot != null && cam_slot.GetComponent<CITV>() != null)
             {

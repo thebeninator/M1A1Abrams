@@ -9,6 +9,7 @@ using ModUtil;
 using GHPC.Thermals;
 using GHPC;
 using GHPC.Weapons;
+using VanillaAssetUtil.AssetUtil;
 
 namespace M1A1Abrams
 {
@@ -33,16 +34,16 @@ namespace M1A1Abrams
 
         public override void LoadDynamicAssets()
         {
-            if (!AssetUtil.VehicleInMission("_M1IP (variant)") && !AssetUtil.VehicleInMission("_M1 (variant)")) return;
+            if (!AssetUtilApi.VehicleInMission("_M1IP (variant)") && !AssetUtilApi.VehicleInMission("_M1 (variant)")) return;
 
             Vehicle vic;
-            if (AssetUtil.VehicleInMission("_M1IP (variant)"))
+            if (AssetUtilApi.VehicleInMission("_M1IP (variant)"))
             {
-                vic = AssetUtil.LoadVanillaVehicle("M1IP");
-            } 
+                vic = AssetUtilApi.LoadVanillaVehicle("M1IP", temp: true);
+            }
             else
             {
-                vic = AssetUtil.LoadVanillaVehicle("M1");
+                vic = AssetUtilApi.LoadVanillaVehicle("M1", temp: true);
             }
 
             Transform flir = vic.GetComponentInChildren<FireControlSystem>(true).transform.Find("FLIR");

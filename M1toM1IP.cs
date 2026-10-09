@@ -8,6 +8,7 @@ using HarmonyLib;
 using ModUtil;
 using Presets;
 using M1A1Abrams.Presets;
+using VanillaAssetUtil.AssetUtil;
 
 namespace M1A1Abrams
 {
@@ -43,7 +44,7 @@ namespace M1A1Abrams
                 {
                     __state.TransmogNeeded = true;
                     __state.Preset = preset;
-                    AssetUtil.TempLoadVanillaVehicle("M1");
+                    AssetUtilApi.LoadVanillaVehicle("M1", temp: true);
                     uniqueName = "M1IP";
                 }
             }

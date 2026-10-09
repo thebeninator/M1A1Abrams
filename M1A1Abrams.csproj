@@ -104,12 +104,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Desktop\GHPC MODDED\GHPC_Data\Managed\UnityEngine.UIModule.dll</HintPath>
     </Reference>
+    <Reference Include="VanillaAssetUtil">
+      <HintPath>D:\GHPC MODDED\Mods\VanillaAssetUtil.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ammo_120mm.cs" />
     <Compile Include="Assets.cs" />
     <Compile Include="M1Preset.cs" />
-    <Compile Include="ModUtil\AssetUtil.cs" />
     <Compile Include="Canister.cs" />
     <Compile Include="CITV.cs" />
     <Compile Include="DigitalEnhancement.cs" />
