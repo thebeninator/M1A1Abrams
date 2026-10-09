@@ -187,6 +187,7 @@ namespace M1A1Abrams
             PostProcessVolume post_vol = post.transform.Find("FLIR Only Volume").GetComponent<PostProcessVolume>();
             post_vol.enabled = true;
             nods_snv._postVolume = post_vol.GetComponent<PostProcessVolume>();
+            nods_snv._postVolume.enabled = false;
         }
 
         void Update() {
