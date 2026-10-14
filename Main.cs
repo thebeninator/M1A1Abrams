@@ -50,12 +50,12 @@ namespace M1A1Abrams
         }
 
         public override void OnSceneWasLoaded(int build_idx, string scene_name) {
-            if (scene_name == "MainMenu2_Scene" || scene_name == "MainMenu2-1_Scene" || scene_name == "t64_menu")
+            if (Util.MenuScreens.Contains(scene_name))
             {
                 module_manager.LoadAllStaticAssets();
             }
 
-            if (Util.menu_screens.Contains(scene_name)) return;
+            if (Util.MenuScreensWithLoader.Contains(scene_name)) return;
 
             valid_scene_count++;
 
