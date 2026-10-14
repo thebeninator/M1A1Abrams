@@ -324,7 +324,7 @@ namespace M1A1Abrams
                 main_gun_info.Name = "120mm gun M256";
                 main_gun.Impulse = 68000;
                 main_gun.CodexEntry = gun_m256;
-                main_gun.WeaponSound.SingleShotEventPaths[0] = "event:/Weapons/canon_125mm-2A46";
+                main_gun.WeaponSound.SingleShotEventPaths[0] = "event:/Weapons/canon_120mm-RH120";
 
                 GameObject dummy_tube = new GameObject("dummy tube");
                 dummy_tube.transform.parent = vic_go.transform.Find("IPM1_rig/HULL/TURRET/GUN");
