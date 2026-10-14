@@ -3,12 +3,17 @@ M153 CROWS model from: "MRAP Oshkosh (West)" (https://marketplace.vigilante.us/p
 
 CITV & M256 model pulled from: "WIP - Abrams M1A2 TUSK 2" (https://skfb.ly/VUwX) by DavidFalke
 
+# Dependencies
+VanillaAssetUtil: https://github.com/thebeninator/VanillaAssetUtil/releases/latest
+
 # M1A1 Abrams
 A mod for Gunner, HEAT, PC! Requires [MelonLoader](https://github.com/LavaGang/MelonLoader/)
 
 Gameplay/Install guide: https://www.youtube.com/watch?v=e_qNIyBb2SA
 
 If you get an error launching through Steam you will need to run the game executable directly.
+
+---
 
 ![Screenshot_9](https://github.com/thebeninator/M1A1Abrams/assets/89621837/0fcbec7f-dc15-4ef2-850e-8e48c5783260)
 ![image](https://github.com/thebeninator/M1A1Abrams/assets/89621837/c80ef9c8-7e42-485c-957e-6cba0dd20c0c)
