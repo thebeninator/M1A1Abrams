@@ -1,14 +1,14 @@
-﻿using System.Linq;
-using MelonLoader;
-using M1A1Abrams;
+﻿using System.Collections;
+using System.Linq;
 using GHPC.State;
-using System.Collections;
-using UnityEngine;
 using GHPC.Vehicle;
+using M1A1Abrams;
+using MelonLoader;
 using ModUtil;
 using Presets;
+using UnityEngine;
 
-[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.3.3B1", "ATLAS")]
+[assembly: MelonInfo(typeof(M1A1AbramsMod), "M1A1 Abrams", "1.3.3B2", "ATLAS")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace M1A1Abrams
