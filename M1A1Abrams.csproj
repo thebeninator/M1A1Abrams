@@ -64,7 +64,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="Tomlet, Version=5.1.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\GHPC MODDED\MelonLoader\Dependencies\SupportModules\Tomlet.dll</HintPath>
+      <HintPath>D:\GHPC MODDED\MelonLoader\net35\Tomlet.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Addressables, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
